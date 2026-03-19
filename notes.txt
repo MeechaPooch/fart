@@ -1,0 +1,6 @@
+should there be a distinction between templates and mediatypes (and mimetypes).
+Mimetypes being the file types assigned by the mime-types package
+Mediatypes being the media types, that the templates use to decide what is what. Mediatypes are basically the same given what is inside the folder.
+Templates being the html visual representation, which can be customized. Templates change depending on how many files there are in a folder.
+
+option to Replace file extensions with file name and icon preview on left

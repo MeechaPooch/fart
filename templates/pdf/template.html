@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High-Res Interactive PDF Viewer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css">
+    <style>
+        /* No background colors set for body or wrapper per request */
+        #pdf-viewer-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            width: 100%;
+            padding: 20px 0;
+        }
+
+        #pdf-viewer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .pdf-page-container {
+            position: relative;
+            margin-bottom: 30px; 
+            background-color: #ffffff; /* White page for readability */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .page-loader {
+            width: 30px; height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            z-index: 0;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .pdf-canvas, .textLayer, .annotationLayer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+
+        .pdf-canvas { z-index: 1; }
+        .textLayer { z-index: 2; }
+        .annotationLayer { z-index: 3; }
+
+        .rendering-hidden {
+            visibility: hidden;
+        }
+
+        .textLayer > span {
+            color: transparent !important;
+            position: absolute;
+            white-space: pre;
+            cursor: text;
+            transform-origin: 0% 0%;
+        }
+
+        .textLayer ::selection {
+            background: rgba(0, 100, 255, 0.4);
+            color: rgba(0, 100, 255, 0.1);
+        }
+
+        /* Support for links */
+        .annotationLayer section {
+            position: absolute;
+            text-align: initial;
+            pointer-events: auto;
+        }
+        .annotationLayer .linkAnnotation > a {
+            position: absolute;
+            font-size: 1em;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: auto !important;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div id="pdf-viewer-wrapper">
+    <div id="pdf-viewer-content"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<script>
+    const url = `$pdfurl`; 
+    
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+
+    let pdfDoc = null;
+    let pageElements = [];
+    let renderedScales = {};
+
+    async function initPDF() {
+        try {
+            pdfDoc = await pdfjsLib.getDocument(url).promise;
+            const viewer = document.getElementById('pdf-viewer-content');
+
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                const page = await pdfDoc.getPage(i);
+                const unscaled = page.getViewport({ scale: 1 });
+                const isLandscape = unscaled.width > unscaled.height;
+                const targetWidth = isLandscape ? (window.innerWidth * 0.9) : Math.min(700, window.innerWidth * 0.9);
+                const viewport = page.getViewport({ scale: targetWidth / unscaled.width });
+
+                const container = document.createElement('div');
+                container.className = 'pdf-page-container';
+                container.dataset.pageNumber = i;
+                container.style.width = `${viewport.width}px`;
+                container.style.height = `${viewport.height}px`;
+                
+                const loader = document.createElement('div');
+                loader.className = 'page-loader';
+                container.appendChild(loader);
+
+                viewer.appendChild(container);
+                pageElements.push(container);
+                observer.observe(container);
+            }
+        } catch (e) {
+            console.error("PDF Init Error:", e);
+        }
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const pageNum = parseInt(entry.target.dataset.pageNumber);
+                renderPageRange(pageNum);
+            }
+        });
+    }, { rootMargin: '150% 0px' }); 
+
+    async function renderPageRange(current) {
+        [current - 1, current, current + 1].forEach(num => {
+            if (num > 0 && num <= pdfDoc.numPages) renderSinglePage(num);
+        });
+    }
+
+    async function renderSinglePage(num) {
+        const currentScale = (window.devicePixelRatio || 1) * (window.visualViewport ? window.visualViewport.scale : 1);
+        if (renderedScales[num] === currentScale) return;
+        renderedScales[num] = currentScale;
+
+        const page = await pdfDoc.getPage(num);
+        const container = pageElements[num - 1];
+        const unscaled = page.getViewport({ scale: 1 });
+        const targetWidth = (unscaled.width > unscaled.height) ? (window.innerWidth * 0.9) : Math.min(700, window.innerWidth * 0.9);
+        const viewport = page.getViewport({ scale: targetWidth / unscaled.width });
+
+        container.style.width = `${viewport.width}px`;
+        container.style.height = `${viewport.height}px`;
+
+        const oldLayers = container.querySelectorAll('.pdf-canvas, .textLayer, .annotationLayer');
+        
+        const newCanvas = document.createElement('canvas');
+        newCanvas.className = 'pdf-canvas rendering-hidden';
+        newCanvas.width = Math.floor(viewport.width * currentScale);
+        newCanvas.height = Math.floor(viewport.height * currentScale);
+
+        const newTextLayer = document.createElement('div');
+        newTextLayer.className = 'textLayer rendering-hidden';
+
+        const newAnnotationLayer = document.createElement('div');
+        newAnnotationLayer.className = 'annotationLayer rendering-hidden';
+
+        container.appendChild(newCanvas);
+        container.appendChild(newTextLayer);
+        container.appendChild(newAnnotationLayer);
+
+        // 1. Render Canvas
+        const renderContext = {
+            canvasContext: newCanvas.getContext('2d'),
+            viewport: viewport,
+            transform: currentScale !== 1 ? [currentScale, 0, 0, currentScale, 0, 0] : null
+        };
+        await page.render(renderContext).promise;
+
+        // 2. Render Text
+        const textContent = await page.getTextContent();
+        await pdfjsLib.renderTextLayer({ textContent, container: newTextLayer, viewport, textDivs: [] }).promise;
+
+        // 3. Render Annotations - Full Mock Link Service to solve "t is undefined"
+        const annotations = await page.getAnnotations();
+        const annotationLayer = new pdfjsLib.AnnotationLayer({
+            viewport: viewport.clone({ dontFlip: true }),
+            div: newAnnotationLayer,
+            annotations: annotations,
+            page: page,
+            linkService: {
+                externalLinkTarget: 2,
+                externalLinkEnabled: true,
+                isExternalLinkTargetSet: true,
+                isInPresentationMode: false,
+                getDestinationHash: (dest) => "#",
+                getAnchorUrl: (hash) => hash,
+                setHash: (hash) => {},
+                executeNamedAction: (action) => {},
+                cachePageRef: (pageNum, pageRef) => {},
+                navigateTo: (dest) => {},
+                getPagesCount: () => pdfDoc.numPages
+            },
+            downloadManager: null,
+            imageResourcesPath: "",
+            renderInteractiveForms: false
+        });
+        
+        annotationLayer.render();
+
+        // Reveal new layers instantly
+        newCanvas.classList.remove('rendering-hidden');
+        newTextLayer.classList.remove('rendering-hidden');
+        newAnnotationLayer.classList.remove('rendering-hidden');
+        oldLayers.forEach(el => el.remove());
+        
+        const loader = container.querySelector('.page-loader');
+        if (loader) loader.remove();
+    }
+
+    let resizeTimeout;
+    const triggerRefresh = () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            renderedScales = {}; 
+            pageElements.forEach((el, index) => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) renderPageRange(index + 1);
+            });
+        }, 300);
+    };
+
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', triggerRefresh);
+    window.addEventListener('resize', triggerRefresh);
+
+    initPDF();
+</script>
+
+</body>
+</html>

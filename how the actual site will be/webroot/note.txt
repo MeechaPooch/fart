@@ -1,0 +1,52 @@
+Html files in the webroot will reference assets in the assetroot, which will be the original folder that the whole thing is generated based off of.
+
+Webroot will be generated recusively. Could it be like copy the entire assetroot and then replace each asset file from the bottom up with the transposed versions. Dont actually copy the files cause that would be inefficient. 
+
+Build a tree representation of the entire assets file tree. Then, recurse up the tree from the leafs, generating webroot files and saving them. Save -P (create parents). 
+
+/photos/jan2020/photo1/index.html
+/photos/jan2020/index.html
+/photos/index.html
+
+Create an index.html file at each spot where you'd save a photo
+
+For making icons
+Load icons in loadtemplates
+geticon function in dirnode
+templates icon takes precident over mediatype emoji
+
+Make the audioplayer module js and visual element a part of the main site site.html
+include a function in audio.js show() that shows the visual element and hide()
+
+Preload all audio files in a album ;)
+
+Automatically calculate album title via Artistname - Album title in folder name! Perhaps also include the release date in that
+
+Create framework for getting certain values. Settings file!!
+dirnode.getSettings()['author'] ?? calculated value from template! :)
+
+When navigating away from playing file, create alert that says "leaving the page will stop the music, are you sure you would like to continue?"
+Ultimately, have playing audio persist between switching pages. But that will need to be a part of the precaching superfast loading rewrite
+
+Download button by everything!
+Download button next to every music track, and at end or top of album. Next to. Have the normal fullpage theme include a download button. Have a zipper for downloading folders. Module in nginx? https://github.com/evanmiller/mod_zip
+Download button appears on right side of music track ON HOVER
+
+/Eating Food Video
+    /movie.mp4
+    /note.txt
+    /script.docx
+    /places-we've-shown-it
+    /images-behind-the-scenes
+        /image1.heic
+        /image2.heic
+        /image3.heic
+        ...
+        /image32.heic
+    
+
+Display timestamps on everything, but subtly
+
+Use soffice libreoffice command line tool to convert from docx or odt to html
+Remap images and stuff
+perhaps https://www.npmjs.com/package/libreoffice

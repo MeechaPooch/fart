@@ -1,0 +1,4 @@
+On ubuntu machine
+Install soffice (libreoffice-writer)
+Download script
+Run script

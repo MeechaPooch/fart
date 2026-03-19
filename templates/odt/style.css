@@ -1,0 +1,42 @@
+    .document {
+        line-height: 1.5;
+        /* padding: 40px; */
+
+        /* max-width: max(70vw, 600px); */
+        max-width: min(940px, 90vw);
+    }
+
+    .document>* {
+        line-height: 1.5;
+        padding: 10px;
+    }
+
+
+    div p.wrapp {
+        text-indent: 20px;
+        /* padding-left: 25px; */
+    }
+
+    img {
+        max-height: 50vh;
+        max-width: 50vw;
+    }
+
+    /* Ensure underlines actually show up */
+    u {
+        text-decoration: underline;
+    }
+
+    /* Define your sizes here */
+    .large-text {
+        font-size: 24px;
+    }
+
+    .small-text {
+        font-size: 10px;
+    }
+
+    h1 {
+        font-size: 2em;
+        color: #333;
+    }

@@ -1,0 +1,4 @@
+.documentpage {
+    max-width: min(850px,90vw);
+    /* font-size-adjust: 0.6; */
+}

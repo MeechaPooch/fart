@@ -1,0 +1,128 @@
+body {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.thing a
+{
+    color: unset;
+    text-decoration: unset;
+}
+.thing a:hover {
+    text-decoration: underline;
+}
+
+.page {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: min-content;
+    gap: 10px;
+}
+.thing {
+    display: flex;
+    flex-flow: row;
+}
+
+.middle {
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+.thing.top {
+    justify-content: flex-start;
+    width: auto;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.backarrow {
+    justify-self: flex-start;
+}
+
+.space {
+    display: flex;
+    flex-grow: 1;
+
+}
+.prevarrow,.nextarrow{
+    transition: 0.2s;
+}
+.prevarrow:hover{
+    translate: -5px;
+}
+.nextarrow:hover{
+    translate: 5px;
+
+}
+.arrow,
+.backarrow {
+    padding: 16px;
+    font-weight: 1000;
+    font-size: 160%;
+    /* background: lightgrey; */
+    /* border-radius: 0px; */
+    /* outline: solid black 1px; */
+}
+
+.backarrow {
+    padding: 7px;
+    border-radius: 10px;
+}
+
+
+.media {
+    display: flex;
+    flex-flow:row;
+    align-items: center;
+    justify-content: center;
+
+    /* width: 70vw;
+    height: 70vh; */
+    max-width: 70vw;
+    max-height: 70vh; 
+    /* height:70vw;
+    width: 70vh; */
+    /* background-color: blue;
+    /* overflow:auto; */
+
+    min-width: min(70vw,70vh);
+    min-height: min(70vw,70vh);
+}
+
+.media img,
+.media video,
+.media>a:has(img) {
+    /* width: 100%; */
+    /* height: 100%; */
+
+    max-width: 70vw;
+    max-height: 70vh; 
+    object-fit: contain;
+    display: block;
+}
+
+.media img {
+    /* height:100px; */
+}
+
+.thing.bottom {
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.mediatitle {
+    text-overflow: ellipsis;
+    text-wrap: nowrap;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 400px;
+}
+.dlbutton {
+    padding:7px;
+}

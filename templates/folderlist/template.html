@@ -1,0 +1,44 @@
+<!-- written by Google Gemini AI -->
+<div class="squares">
+    $squareselems
+</div>
+<style>
+    .squares {
+        display: flex;
+        flex-flow: column;
+        gap: 0px;
+        width:min(600px, 80vw);
+    }
+
+    .square {
+        --height:$squarewidthpx;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-flow: row nowrap;
+        cursor: pointer;
+        height: var(--height);
+        border-top:1px solid black;
+    }
+    .square .icon img {
+        width:$squarewidthpx;
+        border: solid 1px black;
+    }
+    .square .icon {
+        display:flex;
+        font-size: calc($squarewidthpx * 0.8);
+    }
+    .square .itemname {
+        text-align: center;
+    }
+    .square .datetext {
+        color:rgb(191, 191, 191)
+    }
+    .itembutton{
+        display: flex;
+        flex-flow:row nowrap;
+        align-items: center;
+        gap:5px;
+    }
+
+</style>

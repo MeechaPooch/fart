@@ -1,0 +1,28 @@
+@font-face {
+    font-family: nyt-body;
+    src: url(fonts/cheltenham-normal-500.ttf);
+}
+@font-face {
+    font-family: nyt-title;
+    src: url(fonts/imperial-normal-700.ttf);
+}
+
+* {
+    font-size: 20px;;
+    font-family: nyt-body;
+}
+.title {
+    font-family: nyt-title;
+    font-size: 40px;;
+}
+.article{
+    white-space: pre-wrap;
+}
+.page {
+    max-width: 800px;
+}
+body{
+    display: flex;
+    flex-flow:column;
+    align-items: center;
+}

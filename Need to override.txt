@@ -1,0 +1,14 @@
+Need to override
+Mediatype discovery service
+Template discovery service
+And template
+
+Do I need to make a distinction between real mediatype and displayed mediatype?
+
+Lets first not do that and then add that later.
+
+Example:
+
+Music library, and I want to have the thumbnailer thumbnail it as a music library, but I want it to display as my custom index.html that is fancy and beautiful and has links to all the inner files.
+
+I may be able to have this logic just be in the index.ts renderer and not need to override any thiscalls in dirnode.
