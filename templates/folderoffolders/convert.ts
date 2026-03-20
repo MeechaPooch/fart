@@ -22,7 +22,7 @@ export default async function convert(dirnode: DirNode): Promise<string> {
 export async function createGoob(dirnode: DirNode): Promise<string> {
     // return 'hi'
     return guyHtml
-        .replaceAll('$foldername', dirnode.getName())
+        .replaceAll('$foldername', dirnode.getDisplayName())
         // .replaceAll('$imageurl', dirnode.getImageUrl())
         .replaceAll('$foldercontent', await dirnode.renderTemplate())
         .replaceAll('$clicklink', dirnode.getWebUrl())

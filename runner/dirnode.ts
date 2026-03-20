@@ -281,6 +281,17 @@ export class DirNode {
     public getName() {
         return this.name
     }
+    public getDisplayName() {
+        return this.chopIndexFromName()
+    }
+    public chopIndexFromName() {
+        let sibs = this.getSiblings()
+        if(sibs.length == sibs.filter(s=>s.getName().match(/^[0-9]+/)).length) {
+            let processedName = this.getName().replace(/^\d+/,'')
+            if(processedName!='') return processedName
+            else return this.getName()
+        } else {return this.getName()}
+    }
     public getNameNeutered() {
         return neutername(this.getName())
     }
