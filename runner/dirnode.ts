@@ -81,6 +81,11 @@ export class DirNode {
         return !this.getParent()
     }
 
+    public getSettings() {
+        let settings = this.getChildren().filter(e=>e.getName()=='settings.txt')[0]
+        return settings;
+    }
+
     // replace with thumbnailer service
     public getIconHtml() {
         return (templates[this.getTemplate()]?.icon) ?? (mediatypes[this.getMediatype()]?.icon) ?? ''
@@ -285,6 +290,9 @@ export class DirNode {
     }
     public getTemplate() {
         return this.template ?? this.calculateTemplate();
+    }
+    public renderTemplate() {
+        return templates[this.getTemplate()].convert(this)
     }
     calculateTemplate() {
         // @ts-ignore

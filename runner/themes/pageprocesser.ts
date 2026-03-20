@@ -12,6 +12,10 @@ let quicklinkHtml = fs.readFileSync(__dirname + '/components/quicklink.html').to
 
 export function processpage(html: string, dirnode: DirNode): string {
 
+    let parsed = dirnode.getNote() ?? ''
+    parsed = parsed.replace(/\n(?=\n)/g, "\n<br>\n");
+    parsed = marked.parse(parsed,{async:false,breaks:true,gfm:true})
+
     return pageHtml
         .replaceAll('$pagehtml', html)
         .replaceAll('$websitename',websitename)
@@ -32,7 +36,7 @@ export function processpage(html: string, dirnode: DirNode): string {
             `)
         // .replaceAll('$shouldihide',dirnode.getIsRoot()?'hidden':'dummy')
         // .replaceAll('$note','this is a note') // need to purify
-        .replaceAll('$note', marked.parse((dirnode.getNote() ?? '').replaceAll('\n', '\n\n'), { async: false }) ?? '') // need to purify
+        .replaceAll('$note',parsed) // need to purify
 }
 
 function createQuickLink(dirnode: DirNode, location: DirNode) {

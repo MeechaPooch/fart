@@ -1,16 +1,15 @@
-<!-- written by Google Gemini AI -->
-<div class="squares">
+<div class="listsquares">
     $squareselems
 </div>
 <style>
-    .squares {
+    .listsquares {
         display: flex;
         flex-flow: column;
         gap: 0px;
         width:min(600px, 80vw);
     }
 
-    .square {
+    .listsquare {
         --height:$squarewidthpx;
         display: flex;
         align-items: center;
@@ -20,21 +19,21 @@
         height: var(--height);
         border-top:1px solid black;
     }
-    .square .icon img {
+    .listsquare .icon img {
         width:$squarewidthpx;
         border: solid 1px black;
     }
-    .square .icon {
+    .listsquare .icon {
         display:flex;
         font-size: calc($squarewidthpx * 0.8);
     }
-    .square .itemname {
+    .listsquare .itemname {
         text-align: center;
     }
-    .square .datetext {
+    .listsquare .datetext {
         color:rgb(191, 191, 191)
     }
-    .itembutton{
+    .listitembutton{
         display: flex;
         flex-flow:row nowrap;
         align-items: center;

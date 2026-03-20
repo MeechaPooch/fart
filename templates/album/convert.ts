@@ -49,6 +49,6 @@ async function createTrack(dirnode: DirNode) {
         .replaceAll('$trackname', dirnode.getName().split('.').slice(0, -1).join('.'))
         .replaceAll('$trackduration', secstohms(duration))
         .replaceAll('$trackurl', dirnode.getAssetWebUrl())
-        .replaceAll('$trackindex', (dirnode.getParent()?.getNormalChildren().indexOf(dirnode)??-1).toString())
+        .replaceAll('$trackindex', (dirnode.getParent()?.getNormalChildrenMediatype('audio').indexOf(dirnode)??-1).toString())
     return exp;
 }

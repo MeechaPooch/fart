@@ -14,6 +14,8 @@
         font-size: 20px;
         margin: 0;
         margin-bottom: 20px;
+
+        
     }
 
     p,
@@ -33,6 +35,7 @@
         align-items: center;
         /* margin-top: 20px; */
         align-self: center;
+        width:min(1000px, 90vw)
     }
 
     .headbar,
@@ -64,7 +67,7 @@
         padding-left: 10px;
         padding-right: 10px;
         /* border-radius: 20px; */
-        border: solid black 1px;
+        border-top: solid black 1px;
     }
 
     .hidden {
@@ -103,7 +106,7 @@
     }
 
     .containheader {
-        border: solid black 1px;
+        /* border: solid black 1px; */
         border-top: none;
         /* border-bottom-right-radius: 50px; */
         /* border-bottom-left-radius: 50px; */
@@ -146,11 +149,15 @@
     }
 
     .pagenote {
-        padding-bottom: 10px;
-        font-style: italic;
+        width:min(1000px, 90vw);
+        font-size:17px;
+       
+        padding: 10px;
+        /* font-style: italic; */
         align-items: center;
         display: flex;
         flex-direction: column;
+        text-align: center;
     }
 
     .name {
@@ -184,6 +191,10 @@
         display: flex;
         flex-flow: row;
 
+    }
+
+    .spacer{
+        width:3px;
     }
 
     a:not(.normallinks a) {
@@ -253,6 +264,7 @@
             <div class="easybutton $shouldbackbuttonhideFriends">
                 ↖ </div>
         </a>
+        <div class="spacer"></div>
         <a href="$nextlink">
             <div class="easybutton leftarrow"> ← </div>
         </a>

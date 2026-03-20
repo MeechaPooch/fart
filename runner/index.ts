@@ -5,14 +5,41 @@ import { DirNode, DirTree } from './dirnode'
 import { loadEverything, mediatypes, templates } from './loadtemplates'
 import path from 'path'
 import { processpage } from './themes/pageprocesser'
+import {exec} from 'child_process'
 
+async function syncThatShit() {
+    return new Promise((res,rej)=>{
 
+const sourceDir = assetsroot + '/'; // Trailing slash is important for rsync behavior
+const destDir = outputDir + path.sep + assetsname + path.sep + homename;
+
+// The -a flag stands for "archive" mode (preserves permissions, ownership, timestamps, etc.)
+// The -u or --update flag tells rsync to skip any files that are newer in the destination than in the source.
+// The --delete flag ensures files removed from the source are also removed from the destination (optional).
+const rsyncCommand = `rsync -au --delete ${sourceDir} ${destDir}`;
+
+exec(rsyncCommand, (error, stdout, stderr) => {
+    if (error) {
+        console.error(`exec error: ${error}`);
+        rej(error)
+        return;
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+}).on('exit',res);
+    
+})
+}
 
 async function compile() {
-    if(fs.existsSync(outputDir))fs.rmSync(outputDir,{recursive:true})
+    // if(fs.existsSync(outputDir))fs.rmSync(outputDir,{recursive:true}) /// longgg
     fs.mkdirSync(outputDir ,{recursive:true})
     fs.mkdirSync(outputDir +path.sep + assetsname + path.sep + homename,{recursive:true})
-    fs.cpSync(assetsroot,outputDir + path.sep + assetsname + path.sep + homename,{recursive:true,preserveTimestamps:true})
+    // fs.cpSync(assetsroot,outputDir + path.sep + assetsname + path.sep + homename,{recursive:true,preserveTimestamps:true}) /// longg
+    console.log('syncing that shit')
+    await syncThatShit();
+    console.log('that shit sinked')
+    
     fs.cpSync(enginedir,outputDir + path.sep + enginename,{recursive:true})
     process.chdir(outputDir + path.sep + assetsname + path.sep + homename)
     let dir = fs.readdirSync('.',{recursive:true,withFileTypes:true})

@@ -2,7 +2,7 @@ import { DirNode } from "../../runner/dirnode";
 
 
 export default function detect(dirnode: DirNode): number  {
-    return dirnode.getMediatype()=='gallery' ? 1 : 0
+    return dirnode.getMediatype()=='gallery' ? 4 : 0
 }
 
 // export default function detect(dirnode: DirNode): number | false {
