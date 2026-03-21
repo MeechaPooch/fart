@@ -1,7 +1,7 @@
 const SECS_IN_MINUTE = 60
 const MINUTES_IN_HOUR = 60
 function secstohms(secs) {
-    if(secs===undefined) return '?:??';
+    if (secs === undefined) return '?:??';
     let mins = secs / SECS_IN_MINUTE
     let hours = mins / SECS_IN_MINUTE
 
@@ -21,3 +21,4 @@ function secstohms(secs) {
 window.magicutils = {
     secstohms,
 }
+function sleep(mil) { return new Promise(r => setTimeout(r, mil)) }

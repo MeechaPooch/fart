@@ -282,7 +282,6 @@
     }
 
     window.addEventListener('keydown', e => {
-        console.log(e)
         if (e.repeat) return;
         if (e.key == 'ArrowLeft') {
             pagetrix.goto(document.querySelector('a:has(>.leftarrow)').getAttribute('href'))

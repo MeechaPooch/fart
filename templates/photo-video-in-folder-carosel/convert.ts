@@ -29,9 +29,11 @@ export default function convert(dirnode: DirNode): string {
 function generateMediaElement(dirnode: DirNode) {
     if (dirnode.getMediatype() == 'image') {
 
-        return `<a href='${dirnode.getAssetWebUrl()}'>
+        return `
         <image src='${dirnode.getAssetWebUrl()}'/>
-        </a>`
+`
+        // <a href='${dirnode.getAssetWebUrl()}'>
+        // </a>`
 
     } else if (dirnode.getMediatype() == 'video') {
 
