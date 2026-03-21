@@ -23,6 +23,8 @@ export default function convert(dirnode: DirNode): string {
         .replaceAll('$prevurl', prevSibling ? '../' + prevSibling.name : '')
         .replaceAll('$mediaelement', generateMediaElement(dirnode))
         .replaceAll('$asseturl', dirnode.getAssetWebUrl())
+        .replaceAll('$nextimageasseturl',dirnode.nextSibling()?.getAssetWebUrl())
+        .replaceAll('$previmageasseturl',dirnode.prevSibling()?.getAssetWebUrl())
     return output;
 }
 

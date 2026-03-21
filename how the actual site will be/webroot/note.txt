@@ -1,3 +1,10 @@
+Add a info tag at the bottom of the page
+mtime date | filesize | 
+
+m 10/21/2025 | 5.2 kB
+
+With image gallery, preload the next and previous image
+
 Html files in the webroot will reference assets in the assetroot, which will be the original folder that the whole thing is generated based off of.
 
 Webroot will be generated recusively. Could it be like copy the entire assetroot and then replace each asset file from the bottom up with the transposed versions. Dont actually copy the files cause that would be inefficient. 

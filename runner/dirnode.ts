@@ -226,6 +226,13 @@ export class DirNode {
     public getSiblingIndex() {
         return this.getSiblings().indexOf(this)
     }
+    public nextSibling() {
+        return this.getSiblings()[this.getSiblingIndex()+1]
+    }
+    public prevSibling() {
+        return this.getSiblings()[this.getSiblingIndex()-1]
+    }
+    
     getParent() {
         return this.parent
     }
