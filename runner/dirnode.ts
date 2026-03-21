@@ -129,7 +129,7 @@ export class DirNode {
     }
 
     getAssetWebUrl() {
-        return webprefix + '/assets/' + this.getFullPathString()
+        return webprefix + '/' + assetsname + '/' + this.getFullPathString()
     }
     getWebUrl() {
         return `${webprefix}/${this.getFullPathString()}`
@@ -288,7 +288,7 @@ export class DirNode {
         return path;
     }
     public getFullPathString(): string {
-        return this.getPath().map(node => node.getName()).join('/')
+        return path.normalize(this.getPath().map(node => node.getName()).join('/'))
     }
 
     public getName() {

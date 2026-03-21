@@ -18,7 +18,8 @@ import { exec } from "child_process";
 async function syncThatShit() {
   return new Promise((res, rej) => {
     const sourceDir = assetsroot + "/"; // Trailing slash is important for rsync behavior
-    const destDir = outputDir + path.sep + assetsname + path.sep + homename;
+    // const destDir = outputDir + path.sep + assetsname + path.sep + homename;
+    const destDir = outputDir + path.sep + assetsname ;
 
     // The -a flag stands for "archive" mode (preserves permissions, ownership, timestamps, etc.)
     // The -u or --update flag tells rsync to skip any files that are newer in the destination than in the source.
@@ -41,7 +42,7 @@ async function compile() {
   // if(fs.existsSync(outputDir))fs.rmSync(outputDir,{recursive:true}) /// longgg
   fs.mkdirSync(outputDir, { recursive: true });
   fs.mkdirSync(thumbnailsfullfilepath, {recursive:true});
-  fs.mkdirSync(outputDir + path.sep + assetsname + path.sep + homename, {
+  fs.mkdirSync(outputDir + path.sep + assetsname, {
     recursive: true,
   });
   // fs.cpSync(assetsroot,outputDir + path.sep + assetsname + path.sep + homename,{recursive:true,preserveTimestamps:true}) /// longg
@@ -50,13 +51,13 @@ async function compile() {
   console.log("that shit sinked");
 
   fs.cpSync(enginedir, outputDir + path.sep + enginename, { recursive: true });
-  process.chdir(outputDir + path.sep + assetsname + path.sep + homename);
+  process.chdir(outputDir + path.sep + assetsname);
   let dir = fs.readdirSync(".", { recursive: true, withFileTypes: true });
   // process.chdir('../')
-  process.chdir("../..");
+  process.chdir("..");
 
   // if(!fs.existsSync(homename)) fs.mkdirSync(homename)
-  // process.chdir(homename)
+  // process.chdir(outputDir)
 
   let dirtree = new DirTree();
 

@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { DirNode } from "../dirnode";
-import { homename, webprefix, websitename } from '../consts';
+import { enginewebpath, homename, webprefix, websitename } from '../consts';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { templates } from '../loadtemplates';
@@ -21,7 +21,7 @@ export function processpage(html: string, pagedirnode: DirNode): string {
         .replaceAll('$pagehtml', html)
         .replaceAll('$websitename', websitename)
         .replaceAll('$webprefix', webprefix)
-        .replaceAll('$homeurl', webprefix + '/' + homename)
+        .replaceAll('$homeurl', webprefix)
         .replaceAll('$pagetitle', pagedirnode.getName())
         .replaceAll('$downloadpath', pagedirnode.getAssetWebUrl())
         .replaceAll('$nextlink', pagedirnode.getSiblings()[pagedirnode.getSiblingIndex() - 1]?.getWebUrl() ?? ' ')
@@ -43,6 +43,7 @@ export function processpage(html: string, pagedirnode: DirNode): string {
         // .replaceAll('$note','this is a note') // need to purify
         .replaceAll('$note', parsed) // need to purify
         .replaceAll('$showdownloadbutton', pagedirnode.isfile ? '' : 'hidden')
+        .replaceAll('$enginewebpath',enginewebpath)
 
 
 

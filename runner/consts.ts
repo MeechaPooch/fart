@@ -7,12 +7,13 @@ export let webprefix = '/micahpowch'
 // pre chdir
 export let assetsroot = './REALSITE/assetsroot'
 export let enginedir = './REALSITE/engineassets'
-export let assetsname = 'assets'
+export let assetsname = '.assets'
 export let thumbnailsfoldername = '.thumbnails'
 export let thumbnailsfullfilepath = outputDir + '/' + thumbnailsfoldername
 export let thumbnailswebpath = webprefix + '/' + thumbnailsfoldername
-export let enginename = 'engineassets'
-export let homename = 'home'
+export let enginename = '.engineassets'
+export let enginewebpath = '/micahpowch/'+enginename
+export let homename = ''
 
 export let enginepath = webprefix + '/' + enginename
 
