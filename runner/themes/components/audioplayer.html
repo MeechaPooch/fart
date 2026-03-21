@@ -1,0 +1,125 @@
+<div class="pagetrix-persist" id="audioplayerwidget">
+    <div class="controls paused">
+        <div class="gobutton" onclick="audioplayer.toggle()">
+            <span class="playerplayingbuttonicon">⏸</span>
+            <span class="playerpausedbuttonicon">▶</span>
+
+        </div>
+        <div class="scrubber">
+            <input type="range" min="0" max="1000" value="0" class="audioprogress"
+                onchange="audioplayer.seektopercent(document.querySelector('.audioprogress').value/1000)">
+            <!-- <div class="circle">
+                    <svg height="10" width="10" xmlns="http://www.w3.org/2000/svg">
+                        <circle r="5" cx="5" cy="5" fill="black" />
+                    </svg>
+                </div>-->
+            <div class="line"></div>
+        </div>
+        <div class="time">
+            <span class="playercurrentime">2:04</span>/<span class="playerduration">3:43</span>
+        </div>
+    </div>
+
+    <style>
+#audioplayerwidget{
+    z-index: 10;
+}
+
+        .controls,
+        .controls * {
+            display: flex;
+            align-items: stretch;
+            /* font-family: Sn-pro; */
+            gap: 10px;
+            font-size: 16px;
+        }
+
+        .controls {
+            display: flex;
+            flex-flow: row;
+            outline: solid black 2px;
+            padding: 13px;
+            position: fixed;
+            bottom: 10px;
+            width: calc(var(--width) - 13px * 2);
+            background-color: white;
+        }
+
+        body {
+            margin-bottom: 80px;
+        }
+
+        .scrubber {
+            flex-grow: 1;
+            position: relative;
+            align-items: center;
+            flex-flow: row;
+        }
+
+        .controls * {
+            display: flex;
+            flex-flow: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gobutton {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+        }
+
+        .playerpausedbuttonicon,
+        .playerplayingbuttonicon {
+            display: none;
+        }
+
+        .controls.playing .playerplayingbuttonicon {
+            display: inline-block;
+        }
+
+        /* todo rename .controls to .player */
+
+        .controls.paused .playerpausedbuttonicon {
+            display: inline-block;
+        }
+
+        .scrubber .audioprogress {
+            width: 100%;
+
+            background: none;
+            color: black;
+            appearance: none;
+            height: 100%;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .audioprogress::-webkit-slider-thumb,
+        .audioprogress::-moz-range-thumb {
+            -webkit-appearance: none;
+            background: white;
+            border: solid 2px black;
+            --diameter: 12px;
+            height: var(--diameter);
+            width: var(--diameter);
+        }
+
+        .scrubber>.circle {
+            position: absolute;
+        }
+
+        .scrubber>.line {
+            width: 100%;
+            position: absolute;
+            height: 2px;
+            background-color: black;
+            z-index: -10;
+        }
+
+        .controls .time {
+            gap: 5px;
+        }
+    </style>
+
+</div>
