@@ -282,7 +282,9 @@ export class DirNode {
         return this.name
     }
     public getDisplayName() {
-        return this.chopIndexFromName()
+        let name = this.chopIndexFromName()
+        name = neutername(name)
+        return name;
     }
     public chopIndexFromName() {
         let sibs = this.getSiblings()

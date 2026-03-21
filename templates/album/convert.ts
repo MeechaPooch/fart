@@ -18,7 +18,7 @@ let totalDuration = 0
 export default async function convert(dirnode: DirNode): Promise<string> {
     totalDuration = 0;
     return template
-        .replaceAll('$title', dirnode.getName())
+        .replaceAll('$title', dirnode.getDisplayName())
         .replaceAll('$artist', 'unknown artist') // todo fix
         .replaceAll('$year', new Date(dirnode.statSync().mtime).getFullYear().toString())
         .replaceAll('$imageurl', dirnode.getNormalChildren().filter(c => c.getMediatype() == 'image')[0]?.getAssetWebUrl() ?? default_image_url) // integrate special file into template or dirnode
@@ -41,12 +41,12 @@ async function createTrack(dirnode: DirNode) {
     // })
     let duration = (await parseFile(dirnode.getFilePath(), { duration: true })).format.duration
     totalDuration+=duration??0
-    console.log('parsing complete', dirnode.getName())
+    console.log('parsing complete', dirnode.getDisplayName())
     // let duration=0
 
     let exp = tracktemplate;
     exp = exp
-        .replaceAll('$trackname', dirnode.getName().split('.').slice(0, -1).join('.'))
+        .replaceAll('$trackname', dirnode.getDisplayName())
         .replaceAll('$trackduration', secstohms(duration))
         .replaceAll('$trackurl', dirnode.getAssetWebUrl())
         .replaceAll('$trackindex', (dirnode.getParent()?.getNormalChildrenMediatype('audio').indexOf(dirnode)??-1).toString())

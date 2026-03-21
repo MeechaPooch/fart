@@ -15,12 +15,18 @@ import ffmpeg from 'fluent-ffmpeg'
 function createentryhtml(dirnode: DirNode, thumbnailwidth?: number): string {
     let defaultwidth = 200;
     let thumbnailfilename: string = 'none';
-    if (dirnode.getMediatype() == 'image') {
+    generatethumbnail: if (dirnode.getMediatype() == 'image') {
         // thumbnail image
         console.log('thumbnailing image', dirnode.getName())
         // todo: come back to thumbnailer
         try {
             thumbnailfilename = dirnode.getName() + "-thumbnail" + randomstring + '.png'
+            let thumbnailfilepath = dirnode.getParent()?.getFilePath() + '/' + thumbnailfilename;
+
+            /// 🚨🚨🚨🚨🚨
+            if (fs.existsSync(thumbnailfilepath)) break generatethumbnail;
+
+
             sharp(dirnode.getFilePath()).resize(thumbnailwidth ?? defaultwidth).toFile(dirnode.getParent()?.getFilePath() + '/' + thumbnailfilename).catch(e => console.log(e))
         } catch (e) {
             console.log(e)
@@ -29,15 +35,21 @@ function createentryhtml(dirnode: DirNode, thumbnailwidth?: number): string {
         // thumbnail video
         thumbnailfilename = crypto.hash('sha256', dirnode.getName()) + '.png';
         let thumbnailfilepath = dirnode.getParent()?.getFilePath() + '/' + thumbnailfilename;
-        ffmpeg(dirnode.getFilePath()).seekInput(0).frames(1).output(dirnode.getParent()?.getFilePath() + '/' +thumbnailfilename + '-temp.jpeg')
-        .on('error', console.log).on('end', () => {
-            console.log('image finished processing')
-            sharp(thumbnailfilepath + '-temp.jpeg').resize(thumbnailwidth).toFile(thumbnailfilepath).then(() => {
-                if (fs.existsSync(thumbnailfilepath + '-temp.jpeg')) fs.rmSync(thumbnailfilepath + '-temp.jpeg')
-            })
-        }).run()
+
+        /// 🚨🚨🚨🚨🚨
+        if (fs.existsSync(thumbnailfilepath)) break generatethumbnail;
+
+        ffmpeg(dirnode.getFilePath()).seekInput(0).frames(1).output(dirnode.getParent()?.getFilePath() + '/' + thumbnailfilename + '-temp.jpeg')
+            .on('error', console.log).on('end', () => {
+                console.log('image finished processing')
+                sharp(thumbnailfilepath + '-temp.jpeg').resize(thumbnailwidth).toFile(thumbnailfilepath).then(() => {
+                    if (fs.existsSync(thumbnailfilepath + '-temp.jpeg')) fs.rmSync(thumbnailfilepath + '-temp.jpeg')
+                })
+            }).run()
 
     }
+
+
     // with 30 items: 160 (this should be minimum)
     // with 10 items: 400 (this should be minimum)
     return entrytemplate

@@ -13,7 +13,8 @@ export let homename = 'home'
 
 export let enginepath = webprefix + '/' + enginename
 
-export let randomstring = Math.random().toString(36).slice(2)
+export let randomstring = 'sd89sdKK9832Kj'
+// export let randomstring = Math.random().toString(36).slice(2)
 
 // pre chdir
 export let templatesdirpath = './templates'

@@ -16,6 +16,6 @@ export function createSquare(dirnode: DirNode): string {
     return squareHtml
         .replaceAll('$itemicon', dirnode.generateIconHtml())
         // .replaceAll('$imageurl', dirnode.getImageUrl())
-        .replaceAll('$nametitle', dirnode.getNameNeutered())
+        .replaceAll('$nametitle', dirnode.getDisplayName())
         .replaceAll('$clicklink',dirnode.getWebUrl())
 }

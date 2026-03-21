@@ -23,7 +23,7 @@ export function processpage(html: string, dirnode: DirNode): string {
         .replaceAll('$pagetitle', dirnode.getName())
         .replaceAll('$nextlink',dirnode.getSiblings()[dirnode.getSiblingIndex()-1]?.getWebUrl())
         .replaceAll('$prevlink',dirnode.getSiblings()[dirnode.getSiblingIndex()+1]?.getWebUrl())
-        .replaceAll('$currentlocation', dirnode.getPath().map(createLocationButton).join(' ╱ '))
+        .replaceAll('$currentlocation', dirnode.getPath().map(createLocationButton).join('╱'))
         // .replaceAll('$currentlocation', dirnode.getPath().map(createLocationButton).join(' → '))
         .replaceAll('$quicklinks', dirnode.getRoot().getNormalChildren().map(e => createQuickLink(e, dirnode)).join(' | '))
         .replaceAll('$itemname', dirnode.getName())
@@ -81,6 +81,7 @@ export function iconify(dirnode: DirNode): string {
         neuteredname = neuteredname.split('.').slice(0, -1).join('.')
     }
     let icon = dirnode.getIconHtml();
+    if(dirnode.getIsRoot()) icon = '🏠'
 
     let ret = icon ? filetypehtml
         .replaceAll('$icon', icon)
