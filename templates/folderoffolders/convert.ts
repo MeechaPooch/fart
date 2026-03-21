@@ -26,6 +26,7 @@ export async function createGoob(dirnode: DirNode): Promise<string> {
         // .replaceAll('$imageurl', dirnode.getImageUrl())
         .replaceAll('$foldercontent', await dirnode.renderTemplate())
         .replaceAll('$clicklink', dirnode.getWebUrl())
+        .replaceAll('$assetweburl', dirnode.getAssetWebUrl())
 }
 
 // function formatDateString(mtime:Date) {

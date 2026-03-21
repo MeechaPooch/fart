@@ -18,4 +18,6 @@ export function createSquare(dirnode: DirNode): string {
         // .replaceAll('$imageurl', dirnode.getImageUrl())
         .replaceAll('$nametitle', dirnode.getDisplayName())
         .replaceAll('$clicklink',dirnode.getWebUrl())
+        .replaceAll('$fullpath',dirnode.getPathStrings().join('/'))
+        .replaceAll('$assetweburl',dirnode.getAssetWebUrl())
 }

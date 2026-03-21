@@ -3,13 +3,14 @@ import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path';
 import { DirNode } from '../../runner/dirnode';
-import { randomstring, webprefix } from '../../runner/consts';
+import { randomstring, thumbnailsfullfilepath, thumbnailsfoldername, webprefix, thumbnailswebpath } from '../../runner/consts';
 import sharp from 'sharp';
 let template = fs.readFileSync(__dirname + path.sep + './template.html').toString()
 let stylesheet = fs.readFileSync(__dirname + path.sep + './style.css').toString()
 stylesheet = `<style>\n${stylesheet}\n</style>\n`;
 const entrytemplate = fs.readFileSync(__dirname + path.sep + './elements/photo.html').toString();
 import ffmpeg from 'fluent-ffmpeg'
+import { getFileHashSync } from '../../runner/utils';
 // create thumbnail file in assets folder
 
 function createentryhtml(dirnode: DirNode, thumbnailwidth?: number): string {
@@ -17,33 +18,45 @@ function createentryhtml(dirnode: DirNode, thumbnailwidth?: number): string {
     let thumbnailfilename: string = 'none';
     generatethumbnail: if (dirnode.getMediatype() == 'image') {
         // thumbnail image
-        console.log('thumbnailing image', dirnode.getName())
         // todo: come back to thumbnailer
         try {
-            thumbnailfilename = dirnode.getName() + "-thumbnail" + randomstring + '.png'
-            let thumbnailfilepath = dirnode.getParent()?.getFilePath() + '/' + thumbnailfilename;
+            thumbnailfilename = getFileHashSync(dirnode.getFilePath()) + '.png'
+            let thumbnailfilepath = thumbnailsfullfilepath + '/' + thumbnailfilename;
+            // let thumbnailfilepath = dirnode.getParent()?.getFilePath() + '/' + thumbnailfilename;
 
             /// 🚨🚨🚨🚨🚨
-            if (fs.existsSync(thumbnailfilepath)) break generatethumbnail;
+            if (fs.existsSync(thumbnailfilepath)) {
+                // console.log('skipping thumbnailing', thumbnailfilename)
+                break generatethumbnail;
+            }
+
+            console.log('thumbnailing image', dirnode.getName())
+
+            sharp(dirnode.getFilePath()).resize(thumbnailwidth ?? defaultwidth).toFile(thumbnailfilepath).catch(e => console.log(e)).finally(() => { console.log('finished thumbnailing', thumbnailfilename) })
 
 
-            sharp(dirnode.getFilePath()).resize(thumbnailwidth ?? defaultwidth).toFile(dirnode.getParent()?.getFilePath() + '/' + thumbnailfilename).catch(e => console.log(e))
         } catch (e) {
             console.log(e)
         }
     } else if (dirnode.getMediatype() == 'video') {
         // thumbnail video
-        thumbnailfilename = crypto.hash('sha256', dirnode.getName()) + '.png';
-        let thumbnailfilepath = dirnode.getParent()?.getFilePath() + '/' + thumbnailfilename;
+        thumbnailfilename = getFileHashSync(dirnode.getFilePath()) + '.png'
+
+        let thumbnailfilepath = thumbnailsfullfilepath + '/' + thumbnailfilename;
 
         /// 🚨🚨🚨🚨🚨
-        if (fs.existsSync(thumbnailfilepath)) break generatethumbnail;
+        if (fs.existsSync(thumbnailfilepath)) {
+            // console.log('skipping thumbnailing', thumbnailfilepath)
+            break generatethumbnail;
+        }
 
-        ffmpeg(dirnode.getFilePath()).seekInput(0).frames(1).output(dirnode.getParent()?.getFilePath() + '/' + thumbnailfilename + '-temp.jpeg')
+        console.log('thumbnailing video',dirnode.getFilePath())
+        ffmpeg(dirnode.getFilePath()).seekInput(0).frames(1).output(thumbnailfilepath + '-temp.jpeg')
             .on('error', console.log).on('end', () => {
                 console.log('image finished processing')
                 sharp(thumbnailfilepath + '-temp.jpeg').resize(thumbnailwidth).toFile(thumbnailfilepath).then(() => {
                     if (fs.existsSync(thumbnailfilepath + '-temp.jpeg')) fs.rmSync(thumbnailfilepath + '-temp.jpeg')
+                    console.log('finished thumbnailing', thumbnailfilename)
                 })
             }).run()
 
@@ -53,7 +66,8 @@ function createentryhtml(dirnode: DirNode, thumbnailwidth?: number): string {
     // with 30 items: 160 (this should be minimum)
     // with 10 items: 400 (this should be minimum)
     return entrytemplate
-        .replaceAll('$thumbnailurl', `${dirnode.getParent()?.getAssetWebUrl()}/${thumbnailfilename}`)
+        .replaceAll('$thumbnailurl', `${thumbnailswebpath}/${thumbnailfilename}`)
+        // .replaceAll('$thumbnailurl', `${dirnode.getParent()?.getAssetWebUrl()}/${thumbnailfilename}`) // old pre-thumbnail folder
         // .replaceAll('$thumbnailurl', `${webprefix}/assets/${dirnode.getFullPathString()}-thumbnail${randomstring}.png`)
         // .replaceAll('$thumbnailurl', `${webprefix}/assets/${dirnode.getFullPathString()}`)
         .replaceAll('$relativepath', dirnode.name)

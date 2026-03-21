@@ -81,9 +81,15 @@ export class DirNode {
         return !this.getParent()
     }
 
-    public getSettings() {
+    public getSettingsDirnode() {
         let settings = this.getChildren().filter(e=>e.getName()=='settings.txt')[0]
         return settings;
+    }
+    public getSettings():any {
+        return {}
+    }
+    public getSetting(settingName:string):string|null|undefined {
+        return this.getSettings()[settingName];
     }
 
     // replace with thumbnailer service
@@ -94,7 +100,7 @@ export class DirNode {
     public generateIconHtml() {
         let imageUrl = this.getAllNormalChildrenRecursive().filter(child => child.getMediatype() == 'image')[0]?.getAssetWebUrl();
         if (imageUrl) {
-            return `<img src="${imageUrl}"/>`
+            return `<img loading="lazy" src="${imageUrl}"/>`
         } else {
             return `<span class="entryicon">${this.getIconHtml()}</span>`
         }

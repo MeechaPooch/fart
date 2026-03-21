@@ -7,6 +7,16 @@
     <title>$pagetitle</title>
 </head>
 <style>
+    :root {
+        --width: min(400px, 90vw);
+
+    }
+
+    html {
+        overflow-y: scroll;
+        overflow-x: scroll;
+    }
+
     body {
         display: flex;
         flex-flow: column;
@@ -15,7 +25,8 @@
         margin: 0;
         margin-bottom: 20px;
 
-        
+        overflow-y: visible;
+        overflow-x: visible;
     }
 
     p,
@@ -35,7 +46,7 @@
         align-items: center;
         /* margin-top: 20px; */
         align-self: center;
-        width:min(1000px, 90vw)
+        width: min(1000px, 90vw)
     }
 
     .headbar,
@@ -45,7 +56,7 @@
         flex-direction: row;
         flex-wrap: wrap;
         gap: 5px;
-        justify-content: center;
+        justify-content: right;
     }
 
     .typednode {
@@ -72,6 +83,10 @@
 
     .hidden {
         display: none !important;
+    }
+
+    .transparent {
+        opacity: 60%;
     }
 
     .topcontrols {
@@ -101,6 +116,10 @@
         visibility: hidden;
     }
 
+    a:has(>.websitename) {
+        flex-grow: 1;
+    }
+
     .websitename {
         padding-right: 20px;
     }
@@ -119,7 +138,7 @@
     .containtopper {
         display: flex;
         flex-flow: row nowrap;
-        align-items: flex-end;
+        align-items: center;
         justify-content: center;
         gap: 5px;
     }
@@ -129,10 +148,12 @@
         display: flex;
         flex-flow: row wrap;
         max-width: 500px;
+        align-content: center;
+        justify-content: center;
     }
 
     .linkbutton {
-        max-width: 480px;
+        max-width: min(480px, 80vw);
         overflow: hidden;
         text-overflow: ellipsis;
         text-wrap: nowrap;
@@ -149,9 +170,9 @@
     }
 
     .pagenote {
-        width:min(1000px, 90vw);
-        font-size:17px;
-       
+        width: min(1000px, 90vw);
+        font-size: 17px;
+
         padding: 10px;
         /* font-style: italic; */
         align-items: center;
@@ -172,10 +193,23 @@
         float: left;
     }
 
-    .bottomarrows [href="undefined"] {
-        display: none;
+    .bottomarrows [href=" "] {
+        /* display: none; */
+        opacity: 20%;
     }
 
+    .playingcontainer {
+        color: rgb(0, 133, 173) !important;
+        transition: 0s color !important;
+    }
+
+    .playingcontainer:not(.fadetonormal) {
+
+    }
+
+    .fadetonormal {
+        transition: 3s color;
+    }
 
     .easybutton {
         --padding-lr: 10px;
@@ -189,12 +223,15 @@
         outline: 1px solid black;
 
         display: flex;
-        flex-flow: row;
+        flex-flow: column;
+        height: 28px;
+        align-items: center;
+        justify-content: center;
 
     }
 
-    .spacer{
-        width:3px;
+    .spacer {
+        width: 6px;
     }
 
     a:not(.normallinks a) {
@@ -211,10 +248,11 @@
         flex-flow: row nowrap;
         gap: 5px;
         /* margin-top: 20px; */
-        margin:0;
+        margin: 0;
     }
+
     .bottomarrows * {
-        --padding-tb:0 !important;
+        --padding-tb: 0 !important;
     }
 
 
@@ -228,12 +266,57 @@
         bottom: 0;
         right: 0;
     }
+
+    .pagetrix-persist {
+        align-content: center;
+        justify-content: center;
+        display: flex;
+    }
 </style>
-<script src="/micahpowch/engineassets/scripts/magicutils.js"></script>
+
+
+<script data-pagetrix-once>
+    // only happens once!
+    function navigateNextPrevPage() {
+        window.location.href = ""
+    }
+
+    window.addEventListener('keydown', e => {
+        console.log(e)
+        if (e.repeat) return;
+        if (e.key == 'ArrowLeft') {
+            pagetrix.goto(document.querySelector('a:has(>.leftarrow)').getAttribute('href'))
+            // location.href = document.querySelector('a:has(>.leftarrow)').getAttribute('href')
+        } else if (e.key == 'ArrowRight') {
+            pagetrix.goto(document.querySelector('a:has(>.rightarrow)').getAttribute('href'))
+            // location.href = document.querySelector('a:has(>.rightarrow)').getAttribute('href')
+        } else if (e.key == 'Escape') {
+            e.stopPropagation()
+            e.preventDefault()
+            pagetrix.goto('..')
+            // location.href+=document.querySelector('a:has(>.nextarrow)').getAttribute('href')
+
+            // location.href+='/'+document.querySelector('a:has(>.backarrow)').getAttribute('href')
+        }
+    })
+
+    console.log('ello')
+</script>
+
+<script data-pagetrix-once src="/micahpowch/engineassets/scripts/magicutils.js"></script>
+<script src="/micahpowch/engineassets/scripts/magicmouse.js" data-pagetrix-once></script>
+
+
+
+
 
 <body>
+    $audioplayerelem
+    <script src="/micahpowch/engineassets/scripts/audioplayer.js" data-pagetrix-once></script>
+
+
     <div class="containtopper">
-        <a href=".." class="$shouldbackbuttonhide">
+        <a href=".." class="$shouldbackbuttonhideAlone">
 
             <div class="upbutton location $shouldbackbuttonhideAlone">
                 ↖ </div>
@@ -254,15 +337,31 @@
 
 
         </div>
-        <div class="upbutton location spaceholder $shouldbackbuttonhide">
-            ← </div>
+        <div class="upbutton location spaceholder $shouldbackbuttonhideAlone">
+            ↖ </div>
     </div>
 
-      <div class="bottomarrows">
-         <a href=".." class="$shouldbackbuttonhide">
+    <div class="bottomarrows">
+        <a href=".." class="$shouldbackbuttonhide">
 
             <div class="easybutton $shouldbackbuttonhideFriends">
                 ↖ </div>
+        </a>
+
+        <div class="spacer"></div>
+        <a href="$downloadpath" download>
+
+            <div class="easybutton downloadbutton $showdownloadbutton">
+                <img height=20 src="$webprefix/engineassets/images/download-button.svg" />
+            </div>
+        </a>
+        <a href="">
+
+            <div class="easybutton savebutton"> ☆ </div>
+        </a>
+        <a href="" onclick="print()">
+
+            <div class="easybutton printbutton"> 🖶 </div>
         </a>
         <div class="spacer"></div>
         <a href="$nextlink">
@@ -281,39 +380,25 @@
         $pagehtml
     </div>
     <br>
-  
+
 
     <div class="debuginfo">
         $debuginfo
     </div>
+
 </body>
 <!-- todo update engineassets dir -->
-<script src="/micahpowch/engineassets/scripts/magicmouse.js"></script>
+
 
 </html>
 
 <script>
-    function navigateNextPrevPage() {
-        window.location.href = ""
-    }
 
+    // something that happens each time
 
-
-    document.addEventListener('keydown',e=>{
-    console.log(e)
-    if(e.key=='ArrowLeft') {
-        location.href=document.querySelector('a:has(>.leftarrow)').getAttribute('href')
-    } else if (e.key=='ArrowRight') {
-        location.href=document.querySelector('a:has(>.rightarrow)').getAttribute('href')
-    } else if (e.key=='Escape') {
-        e.stopPropagation()
-        e.preventDefault()
-        location.href+='..'
-        // location.href+=document.querySelector('a:has(>.nextarrow)').getAttribute('href')
-
-        // location.href+='/'+document.querySelector('a:has(>.backarrow)').getAttribute('href')
-    }
-})
-
-console.log('ello')
+    audioplayeraddons.setPlayingContainers(true)
 </script>
+
+
+
+<script src="/micahpowch/engineassets/scripts/pagetrix.js" data-pagetrix-once></script>

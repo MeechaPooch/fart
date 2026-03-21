@@ -8,6 +8,9 @@ export let webprefix = '/micahpowch'
 export let assetsroot = './REALSITE/assetsroot'
 export let enginedir = './REALSITE/engineassets'
 export let assetsname = 'assets'
+export let thumbnailsfoldername = '.thumbnails'
+export let thumbnailsfullfilepath = outputDir + '/' + thumbnailsfoldername
+export let thumbnailswebpath = webprefix + '/' + thumbnailsfoldername
 export let enginename = 'engineassets'
 export let homename = 'home'
 

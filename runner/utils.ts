@@ -18,3 +18,17 @@ export function secstohms(secs: number|undefined) {
     ].filter(Boolean).join(':')
     return output
 }
+
+
+// Gemini ai-generated file hash function:
+import { createHash } from 'crypto';
+import { readFileSync } from 'fs';
+
+/**
+ * Synchronously generates a hash for a file.
+ * Best for smaller files or CLI tools where async overhead isn't needed.
+ */
+export function getFileHashSync(filePath: string, algorithm: string = 'sha256'): string {
+  const fileBuffer = readFileSync(filePath);
+  return createHash(algorithm).update(fileBuffer).digest('hex');
+}
