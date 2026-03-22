@@ -11,6 +11,7 @@ export let templates: any = {}
 export let mediatypes: any = {}
 
 export async function loadEverything() {
+    process.chdir(__dirname)
     await loadtemplates();
     await loadmediatypes();
     return true;
