@@ -15,9 +15,12 @@ let totalDuration = 0
 
 export default async function convert(dirnode: DirNode): Promise<string> {
     totalDuration = 0;
+
+    let info = discoverInfo(dirnode);
+
     return template
-        .replaceAll('$title', dirnode.getDisplayName())
-        .replaceAll('$artist', 'unknown artist') // todo fix
+        .replaceAll('$title', info.title)
+        .replaceAll('$artist', info.artist)
         .replaceAll('$year', new Date(dirnode.statSync().mtime).getFullYear().toString())
         .replaceAll('$imageurl', dirnode.getNormalChildren().filter(c => c.getMediatype() == 'image')[0]?.getAssetWebUrl() ?? default_image_url) // integrate special file into template or dirnode
         .replaceAll('$tracks', (await createTrack(dirnode)))
@@ -48,4 +51,26 @@ async function createTrack(dirnode: DirNode) {
         .replaceAll('$trackurl', dirnode.getAssetWebUrl())
         .replaceAll('$trackindex', (dirnode.getParent()?.getNormalChildrenMediatype('audio').indexOf(dirnode)??-1).toString())
     return exp;
+}
+
+
+// add settings definitions options
+function discoverInfo(dirnode: DirNode) {
+    // using the file name, separated by " - "
+    let name = dirnode.getDisplayName();
+    let split = name.split(' - ');
+    let ret: { artist: string, title: string } = {
+        artist: dirnode.getMyTree().getWebsiteAristname(),
+        title: name,
+    }
+    if (split.length == 2) {
+        ret.artist = split[0]
+        ret.title = split[1]
+    }
+
+    // @ts-ignore
+    if (dirnode.getSetting('artist')) ret.artist = dirnode.getSetting('artist')
+    // @ts-ignore
+    if (dirnode.getSetting('title')) ret.title = dirnode.getSetting('title')
+    return ret;
 }

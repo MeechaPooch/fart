@@ -4,16 +4,45 @@ import path from 'path';
 import { mediatypes, templates } from './loadtemplates';
 import detect from '../templates/photo-video-folder-gallery/detect';
 import mime from 'mime-types'
-import { assetsname, homename, outputDir, webprefix, specialfiles, indexfiles, enginepath } from "./consts";
+import { assetsname, homename, webprefix, specialfiles, indexfiles, enginepath, usersOutputDir, thumbnailsfoldername } from "./consts";
 import { neutername } from "./themes/pageprocesser";
 
 export class DirTree {
 
-    rootnode = new DirNode(homename, null)
+    rootnode = new DirNode(this,homename, null)
+    belongsto:string = '';
 
-    constructor() {
 
+    constructor(belongs:string) {
+        this.belongsto = belongs;
     }
+
+    getOutputFilePath() {
+        return usersOutputDir + path.sep + this.belongsto
+    }
+    // for web
+    getThumbnailsWebUrl() {
+        return '/' + thumbnailsfoldername
+    }
+    // for file
+    getThumbnailsFilePath() {
+        return this.getOutputFilePath() + '/' + thumbnailsfoldername
+    }
+
+    getWebsiteDisplayName() {
+        return this.belongsto;
+        // in future, check root settings for website name attribute
+    }
+    getWebsiteUsername() {
+        return this.belongsto
+    }
+    getWebsiteAristname() {
+      return this.belongsto
+    }
+    getWebsiteArtistDir() {
+        return '/'
+    }
+    // get music artist maindir as well!
 
     placedirent(dirent: Dirent) {
         // if(dirent.parentPath=='.') dirent.parentPath = null
@@ -24,6 +53,7 @@ export class DirTree {
 
 export class DirNode {
 
+    mytree:DirTree;
     children: any = {}; // type string to dirnode
     parent: DirNode | null;
     name: string;
@@ -35,12 +65,13 @@ export class DirNode {
     path: DirNode[]; //includes self
     isspecial: boolean = false;
 
-    constructor(name: string, parent: DirNode | null, isfile?: boolean) {
+    constructor(mytree:DirTree, name: string, parent: DirNode | null, isfile?: boolean) {
 
         this.name = name;
         this.parent = parent;
         this.path = [...parent?.path ?? [], this]
         this.isfile = !!isfile;
+        this.mytree = mytree
 
         if (specialfiles.includes(name)) {
             this.isspecial = true;
@@ -129,15 +160,15 @@ export class DirNode {
     }
 
     getAssetWebUrl() {
-        return webprefix + '/' + assetsname + '/' + this.getFullPathString()
+        return webprefix + assetsname + '/' + this.getFullPathString()
     }
     getWebUrl() {
-        return `${webprefix}/${this.getFullPathString()}`
+        return `${webprefix}${this.getFullPathString()}`
     }
 
     // file operations
     getFilePath() {
-        return `${outputDir}/${assetsname}/${this.getFullPathString()}`
+        return `${this.mytree.getOutputFilePath()}/${assetsname}/${this.getFullPathString()}`
     }
     public statSync() {
         return fs.statSync(this.getFilePath())
@@ -262,7 +293,7 @@ export class DirNode {
 
         // create new node if does not exist
         if (!(firstPath in this.children)) {
-            this.children[firstPath] = new DirNode(firstPath, this, placingleaf && isleaffile);
+            this.children[firstPath] = new DirNode(this.mytree, firstPath, this, placingleaf && isleaffile);
         }
 
         let newnode = this.children[firstPath];
@@ -270,8 +301,13 @@ export class DirNode {
 
     }
 
+    public getMyTree() {
+        return this.mytree;
+    }
     public getPath() {
-        return this.path;
+        let path = this.path;
+        if(path[0]?.getName()=='') path = path.slice(1)
+        return path;
     }
     public getPathStrings() {
         return this.getPath().map(e => e.getName()).filter(e => e != '')

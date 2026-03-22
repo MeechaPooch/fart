@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { DirNode } from "../dirnode";
-import { enginewebpath, homename, webprefix, websitename } from '../consts';
+import { enginewebpath, homename, webprefix } from '../consts';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { templates } from '../loadtemplates';
@@ -12,21 +12,20 @@ let quicklinkHtml = fs.readFileSync(__dirname + '/components/quicklink.html').to
 let audioplayerhtml = fs.readFileSync(__dirname + '/components/audioplayer.html').toString()
 
 export function processpage(html: string, pagedirnode: DirNode): string {
-
     let parsed = pagedirnode.getNote() ?? ''
     parsed = parsed.replace(/\n(?=\n)/g, "\n<br>\n");
     parsed = marked.parse(parsed, { async: false, breaks: true, gfm: true })
 
     return pageHtml
         .replaceAll('$pagehtml', html)
-        .replaceAll('$websitename', websitename)
+        .replaceAll('$websitename', pagedirnode.getMyTree().getWebsiteDisplayName()) // replace with custom name settings possible
         .replaceAll('$webprefix', webprefix)
         .replaceAll('$homeurl', webprefix)
         .replaceAll('$pagetitle', pagedirnode.getName())
         .replaceAll('$downloadpath', pagedirnode.getAssetWebUrl())
         .replaceAll('$nextlink', pagedirnode.getSiblings()[pagedirnode.getSiblingIndex() - 1]?.getWebUrl() ?? ' ')
         .replaceAll('$prevlink', pagedirnode.getSiblings()[pagedirnode.getSiblingIndex() + 1]?.getWebUrl() ?? ' ')
-        .replaceAll('$currentlocation', pagedirnode.getPath().map(createLocationButton).join('╱'))
+        .replaceAll('$currentlocation', (pagedirnode.getIsRoot()?'':'╱')+pagedirnode.getPath().map(createLocationButton).join('╱'))
         // .replaceAll('$currentlocation', dirnode.getPath().map(createLocationButton).join(' → '))
         .replaceAll('$quicklinks', pagedirnode.getRoot().getNormalChildren().map(e => createQuickLink(e, pagedirnode)).join(' | '))
         .replaceAll('$audioplayerelem', audioplayerhtml)
@@ -44,6 +43,7 @@ export function processpage(html: string, pagedirnode: DirNode): string {
         .replaceAll('$note', parsed) // need to purify
         .replaceAll('$showdownloadbutton', pagedirnode.isfile ? '' : 'hidden')
         .replaceAll('$enginewebpath',enginewebpath)
+        .replaceAll('$boldifathome',pagedirnode.getIsRoot() ? 'bold':'')
 
 
 

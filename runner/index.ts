@@ -6,8 +6,10 @@ import {
   enginedir,
   enginename,
   homename,
-  outputDir,
-  thumbnailsfullfilepath,
+  projectHome,
+  thumbnailsfoldername,
+  userdirsPath,
+  usersOutputDir,
 } from "./consts";
 import { DirNode, DirTree } from "./dirnode";
 import { loadEverything, mediatypes, templates } from "./loadtemplates";
@@ -15,16 +17,16 @@ import path from "path";
 import { processpage } from "./themes/pageprocesser";
 import { exec } from "child_process";
 
-async function syncThatShit() {
+// excludes dotfiles!
+async function syncThatShit(sourceDir:string, outputDir:string) {
   return new Promise((res, rej) => {
-    const sourceDir = assetsroot + "/"; // Trailing slash is important for rsync behavior
     // const destDir = outputDir + path.sep + assetsname + path.sep + homename;
-    const destDir = outputDir + path.sep + assetsname ;
+    const destDir = outputDir ;
 
     // The -a flag stands for "archive" mode (preserves permissions, ownership, timestamps, etc.)
     // The -u or --update flag tells rsync to skip any files that are newer in the destination than in the source.
     // The --delete flag ensures files removed from the source are also removed from the destination (optional).
-    const rsyncCommand = `rsync -au --delete ${sourceDir} ${destDir}`;
+    const rsyncCommand = `rsync -au --delete ${sourceDir} ${destDir}  --exclude=".*"`; // excludes dotfiles
 
     exec(rsyncCommand, (error, stdout, stderr) => {
       if (error) {
@@ -38,8 +40,12 @@ async function syncThatShit() {
   });
 }
 
-async function compile() {
+async function compile(websitename:string) {
+  process.chdir(projectHome)
   // if(fs.existsSync(outputDir))fs.rmSync(outputDir,{recursive:true}) /// longgg
+  let outputDir = usersOutputDir + path.sep + websitename
+  let assetsroot = userdirsPath + path.sep + websitename
+  let thumbnailsfullfilepath = outputDir + path.sep + thumbnailsfoldername
   fs.mkdirSync(outputDir, { recursive: true });
   fs.mkdirSync(thumbnailsfullfilepath, {recursive:true});
   fs.mkdirSync(outputDir + path.sep + assetsname, {
@@ -47,10 +53,11 @@ async function compile() {
   });
   // fs.cpSync(assetsroot,outputDir + path.sep + assetsname + path.sep + homename,{recursive:true,preserveTimestamps:true}) /// longg
   console.log("syncing that shit");
-  await syncThatShit();
+  await syncThatShit(assetsroot + '/',outputDir + path.sep + assetsname);
   console.log("that shit sinked");
 
-  fs.cpSync(enginedir, outputDir + path.sep + enginename, { recursive: true });
+  // output engine
+  syncThatShit(enginedir + path.sep, outputDir + path.sep + enginename + '/');
   process.chdir(outputDir + path.sep + assetsname);
   let dir = fs.readdirSync(".", { recursive: true, withFileTypes: true });
   // process.chdir('../')
@@ -59,7 +66,7 @@ async function compile() {
   // if(!fs.existsSync(homename)) fs.mkdirSync(homename)
   // process.chdir(outputDir)
 
-  let dirtree = new DirTree();
+  let dirtree = new DirTree(websitename);
 
   dir.forEach((ent) => dirtree.placedirent(ent));
 
@@ -101,7 +108,13 @@ async function compile() {
 async function run() {
   await loadEverything();
   console.log("mediatypes and templates", mediatypes, templates);
-  await compile();
+
+  process.chdir(userdirsPath);
+  let users = fs.readdirSync('.');
+  for (let user of users) {
+    await compile(user)
+  }
+
 }
 run();
 

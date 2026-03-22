@@ -3,7 +3,7 @@ import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path';
 import { DirNode } from '../../runner/dirnode';
-import { randomstring, thumbnailsfullfilepath, thumbnailsfoldername, webprefix, thumbnailswebpath } from '../../runner/consts';
+import { randomstring, thumbnailsfoldername, webprefix } from '../../runner/consts';
 import sharp from 'sharp';
 let template = fs.readFileSync(__dirname + path.sep + './template.html').toString()
 let stylesheet = fs.readFileSync(__dirname + path.sep + './style.css').toString()
@@ -14,6 +14,7 @@ import { getFileHashSync } from '../../runner/utils';
 // create thumbnail file in assets folder
 
 function createentryhtml(dirnode: DirNode, thumbnailwidth?: number): string {
+    let thumbnailsfullfilepath = dirnode.getMyTree().getOutputFilePath() + path.sep + thumbnailsfoldername
     let defaultwidth = 200;
     let thumbnailfilename: string = 'none';
     generatethumbnail: if (dirnode.getMediatype() == 'image') {
@@ -66,7 +67,7 @@ function createentryhtml(dirnode: DirNode, thumbnailwidth?: number): string {
     // with 30 items: 160 (this should be minimum)
     // with 10 items: 400 (this should be minimum)
     return entrytemplate
-        .replaceAll('$thumbnailurl', `${thumbnailswebpath}/${thumbnailfilename}`)
+        .replaceAll('$thumbnailurl', `${dirnode.getMyTree().getThumbnailsWebUrl()}/${thumbnailfilename}`)
         // .replaceAll('$thumbnailurl', `${dirnode.getParent()?.getAssetWebUrl()}/${thumbnailfilename}`) // old pre-thumbnail folder
         // .replaceAll('$thumbnailurl', `${webprefix}/assets/${dirnode.getFullPathString()}-thumbnail${randomstring}.png`)
         // .replaceAll('$thumbnailurl', `${webprefix}/assets/${dirnode.getFullPathString()}`)
