@@ -3,10 +3,11 @@
 import path from "path"
 
 // export let homedir = './home'
-export let userdirsPath = './users'
 
 export let projectHome = '/home/ubuntu/project/swampish'
 export let usersOutputDir = './webroot/users'
+export let userdirsPath = './users'
+
 export let webOutputDir = './webroot'
 export let webprefix = '/'
 
@@ -31,8 +32,8 @@ export let randomstring = 'sd89sdKK9832Kj'
 // export let randomstring = Math.random().toString(36).slice(2)
 
 // pre chdir
-export let templatesdirpath = './templates'
-export let mediatypesdirpath = './mediatypes'
+export let templatesdirpath = '../templates'
+export let mediatypesdirpath = '../mediatypes'
 
 export let indexfiles = [
     'index.html',

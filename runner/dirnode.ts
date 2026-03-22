@@ -168,7 +168,7 @@ export class DirNode {
 
     // file operations
     getFilePath() {
-        return `${this.mytree.getOutputFilePath()}/${assetsname}/${this.getFullPathString()}`
+        return `./${assetsname}/${this.getFullPathString()}`
     }
     public statSync() {
         return fs.statSync(this.getFilePath())
@@ -279,7 +279,7 @@ export class DirNode {
 
 
     placedirent(dirent: Dirent) {
-        this.placepathlist([...dirent.parentPath.split('/').filter(e => e != '.'), dirent.name], !dirent.isDirectory())
+        this.placepathlist([...dirent.path.split('/').filter(e => e != '.'), dirent.name], !dirent.isDirectory())
     }
     placepathlist(path: string[], isleaffile: boolean) {
 
