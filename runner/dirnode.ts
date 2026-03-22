@@ -64,6 +64,7 @@ export class DirNode {
     template: string | undefined;
     path: DirNode[]; //includes self
     isspecial: boolean = false;
+    shouldregen:boolean = false;
 
     constructor(mytree:DirTree, name: string, parent: DirNode | null, isfile?: boolean) {
 
