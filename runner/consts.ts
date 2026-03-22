@@ -3,12 +3,11 @@
 import path from "path"
 
 // export let homedir = './home'
-export let userdirsPath = './USERS'
+export let userdirsPath = './users'
 
-export let projectHome = '/home/micahpowch/project/templates'
-export let websiteName = "Powch Art"
-export let usersOutputDir = '/usr/share/nginx/html/users'
-export let webOutputDir = '/usr/share/nginx/html/'
+export let projectHome = '/home/ubuntu/project/swampish'
+export let usersOutputDir = './webroot/users'
+export let webOutputDir = './webroot'
 export let webprefix = '/'
 
 // static engine web path VS new web path generated per user <- do it this way for now
@@ -17,7 +16,6 @@ export let webprefix = '/'
 // export let engineWebPath = 
 
 // pre chdir
-export let assetsroot = './REALSITE/assetsroot'
 export let enginedir = './ENGINE'
 export let assetsname = '.assets'
 export let thumbnailsfoldername = '.thumbnails'
