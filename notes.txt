@@ -1,3 +1,18 @@
+Replacing local source links with asset path
+Do not replace href links on clickable links
+
+replace src and stylesheet href
+but do not replace <a> href
+like this-
+<link rel="stylesheet" href="style.css">
+turns in to:
+<link rel="stylesheet" href="/.assets/${current-path}/style.css">
+But if it is an <a> href tag, do not replace
+
+I believe the best solution would be to serve different files based on if the content-type header wants application/html or application/css/js/etc. To set this up in nginx. Then, I would have to rework my asset url code to no longer inject the .asset/ url into the thumbnails and image src's of images.
+
+Do this later.
+
 should there be a distinction between templates and mediatypes (and mimetypes).
 Mimetypes being the file types assigned by the mime-types package
 Mediatypes being the media types, that the templates use to decide what is what. Mediatypes are basically the same given what is inside the folder.

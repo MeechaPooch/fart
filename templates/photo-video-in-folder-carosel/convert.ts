@@ -39,7 +39,7 @@ function generateMediaElement(dirnode: DirNode) {
 
     } else if (dirnode.getMediatype() == 'video') {
 
-        return ` <video controls>
+        return ` <video autoplay playsinline controls>
                 <source src='${dirnode.getAssetWebUrl()}' type='${dirnode.getMimetype()}'>
                 Your browser does not support the video tag.
         </video> `

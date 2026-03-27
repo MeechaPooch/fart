@@ -6,38 +6,49 @@
         display: flex;
         flex-flow: column;
         gap: 0px;
-        width:min(600px, 80vw);
+        width: min(600px, 80vw);
     }
 
     .listsquare {
-        --height:$squarewidthpx;
+        --height: $squarewidthpx;
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex-flow: row nowrap;
         cursor: pointer;
         height: var(--height);
-        border-top:1px solid black;
+        border-top: 1px solid black;
     }
+
     .listsquare .icon img {
-        width:$squarewidthpx;
+        width: $squarewidthpx;
         border: solid 1px black;
     }
+
     .listsquare .icon {
-        display:flex;
+        display: flex;
         font-size: calc($squarewidthpx * 0.8);
     }
+
     .listsquare .itemname {
         text-align: center;
     }
-    .listsquare .datetext {
-        color:rgb(191, 191, 191)
-    }
-    .listitembutton{
-        display: flex;
-        flex-flow:row nowrap;
-        align-items: center;
-        gap:5px;
+
+    .itemname {
+        text-overflow: ellipsis;
+        max-width: var(--width);
+        overflow: hidden;
+        max-height: 1.5em;
     }
 
+    .listsquare .datetext {
+        color: rgb(191, 191, 191)
+    }
+
+    .listitembutton {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        gap: 5px;
+    }
 </style>

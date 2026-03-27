@@ -31,8 +31,10 @@ export function processpage(html: string, pagedirnode: DirNode): string {
         .replaceAll('$audioplayerelem', audioplayerhtml)
         .replaceAll('$itemname', pagedirnode.getName())
         .replaceAll('$parentname', iconify(pagedirnode.getParent() ?? pagedirnode))
-        .replaceAll('$shouldbackbuttonhideFriends', (pagedirnode.getIsRoot() || pagedirnode.getSiblings().length < 2) ? 'hidden' : 'dummy')
-        .replaceAll('$shouldbackbuttonhideAlone', (pagedirnode.getIsRoot() || pagedirnode.getSiblings().length >= 2) ? 'hidden' : 'dummy')
+        .replaceAll('$shouldbackbuttonhideFriends', (pagedirnode.getIsRoot())?'hidden':'dummy')
+        .replaceAll('$shouldbackbuttonhideAlone', 'hidden')
+        // .replaceAll('$shouldbackbuttonhideFriends', (pagedirnode.getIsRoot() || pagedirnode.getSiblings().length < 2) ? 'hidden' : 'dummy')
+        // .replaceAll('$shouldbackbuttonhideAlone', (pagedirnode.getIsRoot() || pagedirnode.getSiblings().length >= 2) ? 'hidden' : 'dummy')
         .replaceAll('$debuginfo', `
             Mimetype: ${pagedirnode.getMimetype()}<br>
             Mediatype: ${pagedirnode.getMediatype()}<br>
@@ -92,7 +94,7 @@ export function iconify(dirnode: DirNode): string {
     if (neuteredname.includes('.')) {
         neuteredname = neuteredname.split('.').slice(0, -1).join('.')
     }
-    let icon = dirnode.getIconHtml();
+    let icon = dirnode.generateIconHtml();
     if (dirnode.getIsRoot()) icon = '🏠'
 
     let ret = icon ? filetypehtml

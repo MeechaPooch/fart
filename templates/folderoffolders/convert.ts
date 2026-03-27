@@ -9,9 +9,8 @@ export default async function convert(dirnode: DirNode): Promise<string> {
 
 
 
-
-    return templateHtml
-        .replaceAll('$squareselems', (await Promise.all(dirnode.getNormalChildren().toSorted(
+     return templateHtml
+        .replaceAll('$squareselems', (await Promise.all(dirnode.getNormalChildren().sort(
             (a, b) => {
                 return b.getName() - a.getName()
             }

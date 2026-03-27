@@ -1,4 +1,6 @@
 On ubuntu machine
 Install soffice (libreoffice-writer)
+Install java
+Install libreoffice-java-common
 Download script
 Run script

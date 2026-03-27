@@ -1,7 +1,15 @@
 import chokidar from 'chokidar'
 import child from 'child_process'
+import { converterProjectFolder, userdirsPath, usersOutputDir } from './runner/consts';
 
-var watcher = chokidar.watch(['./templates', './REALSITE', './runner', './mediatypes'], { ignored: /^\./, persistent: true });
+var watcher = chokidar.watch([
+  // './templates', 
+  // './REALSITE', 
+  // './runner', 
+  // './mediatypes'
+  userdirsPath,
+  converterProjectFolder
+], { ignored: /^\./, persistent: true });
 
 let prevprocess: child.ChildProcess | null = null
 let listeneradded = false;

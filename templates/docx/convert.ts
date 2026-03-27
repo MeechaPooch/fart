@@ -16,6 +16,8 @@ let style_soffice = fs.readFileSync(__dirname + '/style-soffice.css')
 export default async function convertt(dirnode: DirNode): Promise<string | undefined> {
 try{
     let outdir = dirnode.getFilePath() + randomstring;
+    console.log('outdir',outdir)
+    console.log('cwd',process.cwd())
     // new main
     await new Promise((resolve, error) => {
         cp.exec(`soffice --headless --norestore --nologo --convert-to html --outdir "${outdir}" "${dirnode.getFilePath()}"`).on('message', (m) => {
@@ -52,8 +54,13 @@ try{
 
     return htmlstring;
 }catch(e) {
- return await convertDocxToHtml(dirnode.getFilePath()) +
-        `<script>${js}</script>
+        console.error('document convert error',e)
+
+
+    let thing = await convertDocxToHtml(dirnode.getFilePath())
+        if (!thing) return undefined;
+        return thing +
+            `<script>${js}</script>
     `;
 }
     // fallback

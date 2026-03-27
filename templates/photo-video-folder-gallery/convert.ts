@@ -14,7 +14,7 @@ import { getFileHashSync } from '../../runner/utils';
 // create thumbnail file in assets folder
 
 function createentryhtml(dirnode: DirNode, thumbnailwidth?: number): string {
-    let thumbnailsfullfilepath = dirnode.getMyTree().getOutputFilePath() + path.sep + thumbnailsfoldername
+    let thumbnailsfullfilepath = thumbnailsfoldername
     let defaultwidth = 200;
     let thumbnailfilename: string = 'none';
     generatethumbnail: if (dirnode.getMediatype() == 'image') {
@@ -32,7 +32,7 @@ function createentryhtml(dirnode: DirNode, thumbnailwidth?: number): string {
             }
 
             console.log('thumbnailing image', dirnode.getName())
-
+console.log('WORKING DIR',process.cwd());
             sharp(dirnode.getFilePath()).resize(thumbnailwidth ?? defaultwidth).toFile(thumbnailfilepath).catch(e => console.log(e)).finally(() => { console.log('finished thumbnailing', thumbnailfilename) })
 
 

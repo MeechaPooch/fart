@@ -11,7 +11,6 @@ export let templates: any = {}
 export let mediatypes: any = {}
 
 export async function loadEverything() {
-    process.chdir(__dirname)
     await loadtemplates();
     await loadmediatypes();
     return true;
@@ -34,7 +33,9 @@ export async function loadtemplates() {
             if (fs.existsSync(iconpath)) icon = fs.readFileSync(iconpath).toString();
 
             templates[template] = { convert, detect, icon }
-        } catch (e) { }
+        } catch (e) { 
+            console.error('error loading template',template,e)
+        }
     }
 }
 

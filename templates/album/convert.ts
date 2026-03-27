@@ -4,7 +4,7 @@ import path from 'path'
 import { parseFile } from 'music-metadata'
 import CodecParser from 'codec-parser'
 import { secstohms } from "../../runner/utils";
-import { enginedir, enginepath, websiteName } from "../../runner/consts";
+import { enginepath } from "../../runner/consts";
 let template = fs.readFileSync(__dirname + path.sep + 'template.html').toString()
 let tracktemplate = fs.readFileSync(__dirname + path.sep + 'components/track.html').toString()
 

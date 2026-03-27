@@ -1,7 +1,7 @@
 <div class="pagetrix-persist" id="audioplayerwidget">
     <div class="controls paused">
         <div class="gobutton" onclick="audioplayer.toggle()">
-            <span class="playerplayingbuttonicon">⏸</span>
+            <span class="playerplayingbuttonicon">||</span>
             <span class="playerpausedbuttonicon">▶</span>
 
         </div>
@@ -21,21 +21,29 @@
     </div>
 
     <style>
-#audioplayerwidget{
-    z-index: 10;
-}
+        #audioplayerwidget {
+            z-index: 10;
+        }
+
+        .controls.playing, body:has(.player) .controls, .controls.showme{
+            display: flex;
+        }
+        .controls{
+            display: none;
+        }
 
         .controls,
         .controls * {
-            display: flex;
             align-items: stretch;
             /* font-family: Sn-pro; */
             gap: 10px;
             font-size: 16px;
         }
+        .controls * {
+            display: flex;
+        }
 
         .controls {
-            display: flex;
             flex-flow: row;
             outline: solid black 2px;
             padding: 13px;
@@ -120,6 +128,97 @@
         .controls .time {
             gap: 5px;
         }
+
+
+
+
+        input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2px;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2px;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 2px;
+  /* Left = Blue | Right = Black */
+  background: linear-gradient(to right, rgb(0, 133, 173) 0%, rgb(0, 133, 173) var(--progress, 0%), #000 var(--progress, 0%), #000 100%);
+  border-radius: 2px;
+}
+
+/* Firefox Track Logic */
+input[type="range"]::-moz-range-progress {
+  background-color: rgb(0, 133, 173); /* Blue on left */
+  height: 2px;
+}
+
+input[type="range"]::-moz-range-track {
+  background-color: #000; /* Black on right */
+  height: 2px;
+}
+
+/* --- THE BLACK CIRCLE (THUMB) --- */
+
+/* Chrome, Safari, Edge */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #000; /* Set circle to black */
+  margin-top: -7px; /* Centers 16px thumb on 2px track */
+  border: none;
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #000; /* Set circle to black */
+  border: none;
+}
     </style>
 
+<script>const slider = document.querySelector('input[type="range"]');
+
+// 1. The core function that handles the visual "fill"
+function updateSliderVisuals() {
+  const min = slider.min || 0;
+  const max = slider.max || 100;
+  const value = slider.value;
+  
+  const percentage = (value - min) * 100 / (max - min);
+  slider.style.setProperty('--progress', percentage + '%');
+}
+
+// 2. Listen for manual user interaction (dragging/clicking)
+slider.addEventListener('input', updateSliderVisuals);
+
+// 3. How to update it via CODE
+function updateSliderByCode(newValue) {
+  slider.value = newValue;   // Sets the physical position
+  updateSliderVisuals();     // Sets the blue/black colors
+}
+
+// Initial call to set the color on page load
+updateSliderVisuals();
+
+// --- EXAMPLE USAGE ---
+// Instead of just doing: slider.value = 80;
+// Do this:
+</script>
 </div>

@@ -130,11 +130,12 @@ export class DirNode {
     }
 
     public generateIconHtml() {
-        let imageUrl = this.getAllNormalChildrenRecursive().filter(child => child.getMediatype() == 'image')[0]?.getAssetWebUrl();
+        let imageUrl = this.getMeAndAllNormalChildrenRecursive().filter(child => child.getMediatype() == 'image')[0]?.getAssetWebUrl();
         if (imageUrl) {
-            return `<img loading="lazy" src="${imageUrl}"/>`
+            return `
+            <span class="entryicon hi"><img loading="lazy" src="${imageUrl}"/></span>`
         } else {
-            return `<span class="entryicon">${this.getIconHtml()}</span>`
+            return `<span class="entryicon">${this.getIconHtml()}</span>`.replaceAll('$imageurl',imageUrl)
         }
     }
     // for now just return whatever image there is, but later, create a thumbnailing system
@@ -280,7 +281,7 @@ export class DirNode {
 
 
     placedirent(dirent: Dirent) {
-        this.placepathlist([...dirent.path.split('/').filter(e => e != '.'), dirent.name], !dirent.isDirectory())
+        this.placepathlist([...dirent.parentPath.split('/').filter(e => e != '.'), dirent.name], !dirent.isDirectory())
     }
     placepathlist(path: string[], isleaffile: boolean) {
 
@@ -396,5 +397,8 @@ export class DirNode {
 
     public getAllNormalChildrenRecursive(depth?: number) {
         return this.getAllChildrenRecursive(depth).filter(child => !child.getIsSpecial())
+    }
+    public getMeAndAllNormalChildrenRecursive(depth?:number) {
+        return [this,...this.getAllNormalChildrenRecursive(depth)]
     }
 }
