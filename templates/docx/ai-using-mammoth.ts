@@ -29,7 +29,7 @@ export async function convertDocxToHtml(inputPath: string) {
     ${stylecss}
     </style>
 
-<div class="document normallinks">
+<div class="document normallink">
     ${result.value}
 </div>
 </html>`;

@@ -46,6 +46,8 @@ export function processpage(html: string, pagedirnode: DirNode): string {
         .replaceAll('$showdownloadbutton', pagedirnode.isfile ? '' : 'hidden')
         .replaceAll('$enginewebpath',enginewebpath)
         .replaceAll('$boldifathome',pagedirnode.getIsRoot() ? 'bold':'')
+        .replaceAll('$shouldhidecontrols',pagedirnode.getSetting('hidecontrols') ? 'hidden' : '')
+        .replaceAll('$shouldhidepath',pagedirnode.getSetting('hidepath') ? 'hidden' : '')
 
 
 

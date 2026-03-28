@@ -4,16 +4,16 @@ import path from 'path';
 import { mediatypes, templates } from './loadtemplates';
 import detect from '../templates/photo-video-folder-gallery/detect';
 import mime from 'mime-types'
-import { assetsname, homename, webprefix, specialfiles, indexfiles, enginepath, usersOutputDir, thumbnailsfoldername } from "./consts";
+import { assetsname, homename, webprefix, specialfiles, indexfiles, enginepath, usersOutputDir, thumbnailsfoldername, settingsname } from "./consts";
 import { neutername } from "./themes/pageprocesser";
 
 export class DirTree {
 
-    rootnode = new DirNode(this,homename, null)
-    belongsto:string = '';
+    rootnode = new DirNode(this, homename, null)
+    belongsto: string = '';
 
 
-    constructor(belongs:string) {
+    constructor(belongs: string) {
         this.belongsto = belongs;
     }
 
@@ -37,7 +37,7 @@ export class DirTree {
         return this.belongsto
     }
     getWebsiteAristname() {
-      return this.belongsto
+        return this.belongsto
     }
     getWebsiteArtistDir() {
         return '/'
@@ -51,9 +51,25 @@ export class DirTree {
 
 }
 
+const handler = {
+    get(target: DirNode, prop: any, receiver: any) {
+        const value = Reflect.get(target, prop, receiver);
+
+        // Check if the property being accessed is a function
+        if (typeof value === 'function') {
+            let newme = target.me()
+            // Return the function bound to your desired thisArg
+            return value.bind(newme);
+        }
+
+        return value;
+    }
+};
+
+
 export class DirNode {
 
-    mytree:DirTree;
+    mytree: DirTree;
     children: any = {}; // type string to dirnode
     parent: DirNode | null;
     name: string;
@@ -64,20 +80,61 @@ export class DirNode {
     template: string | undefined;
     path: DirNode[]; //includes self
     isspecial: boolean = false;
-    shouldregen:boolean = false;
+    shouldregen: boolean = false;
+    originalpath: DirNode[];
 
-    constructor(mytree:DirTree, name: string, parent: DirNode | null, isfile?: boolean) {
+
+
+
+    constructor(mytree: DirTree, name: string, parent: DirNode | null, isfile?: boolean) {
 
         this.name = name;
         this.parent = parent;
         this.path = [...parent?.path ?? [], this]
+        this.originalpath = this.path;
         this.isfile = !!isfile;
         this.mytree = mytree
 
         if (specialfiles.includes(name)) {
             this.isspecial = true;
         }
+
+        // let me = new Proxy(this, handler);
+        // return me;
     }
+    public collapseMe() {
+
+        // this.getChildren().forEach(c=>c.collapseMe())
+
+        if (!this.isfile) return;
+
+        let oldParent = this.getParent()
+        if (!oldParent) return;
+        let oldGrandparent = oldParent.getParent();
+        if (!oldGrandparent) return;
+        // if has same name
+        if (oldParent?.getName() != this.getName()) return;
+
+        console.log('REPLACING NOW', this.getPathStrings())
+        console.log('parent', oldParent.getPathStrings())
+        console.log('grandparent', oldGrandparent.getPathStrings())
+
+        // now do replacing
+        oldGrandparent.children[oldParent.getName()] = this;
+        this.children = oldParent.children
+        this.parent = oldGrandparent;
+        delete this.children[this.getName()]
+
+        oldParent.parent = null; // disconnect from parent
+        oldParent.children = {} // disconnect from children
+        oldParent.path = []
+
+        this.recalculatePath();
+        console.log('new path', this.getPathStrings())
+        this.getAllChildrenRecursive().forEach(c => c.recalculatePath())
+
+    }
+
     public getIsSpecial() {
         return specialfiles.includes(this.name)
             || this.getName().startsWith('.')
@@ -112,15 +169,13 @@ export class DirNode {
     public getIsRoot() {
         return !this.getParent()
     }
-
-    public getSettingsDirnode() {
-        let settings = this.getChildren().filter(e=>e.getName()=='settings.txt')[0]
+    public getSettings(): any {
+        let settingsFile = this.getChild(settingsname)
+        if (!settingsFile) return {};
+        let settings = Object.fromEntries(settingsFile.readSync().split('\n').map(line => line.split('=')))
         return settings;
     }
-    public getSettings():any {
-        return {}
-    }
-    public getSetting(settingName:string):string|null|undefined {
+    public getSetting(settingName: string): string | null | undefined {
         return this.getSettings()[settingName];
     }
 
@@ -135,7 +190,7 @@ export class DirNode {
             return `
             <span class="entryicon hi"><img loading="lazy" src="${imageUrl}"/></span>`
         } else {
-            return `<span class="entryicon">${this.getIconHtml()}</span>`.replaceAll('$imageurl',imageUrl)
+            return `<span class="entryicon">${this.getIconHtml()}</span>`.replaceAll('$imageurl', imageUrl)
         }
     }
     // for now just return whatever image there is, but later, create a thumbnailing system
@@ -170,7 +225,7 @@ export class DirNode {
 
     // file operations
     getFilePath() {
-        return `./${assetsname}/${this.getFullPathString()}`
+        return `./${assetsname}/${this.getFullFilePathString()}`
     }
     public statSync() {
         return fs.statSync(this.getFilePath())
@@ -208,7 +263,7 @@ export class DirNode {
         return output
     }
 
-    getReplacableThis() {
+    me(): DirNode {
         // look for children that match the index criteria
         // index criteria: are in the indexfiles list
 
@@ -216,10 +271,14 @@ export class DirNode {
         let indexfile = this.getChildren().filter(child => indexfiles.includes(child.getName())).sort((a, b) => {
             return indexfiles.indexOf(b.getName()) - indexfiles.indexOf(a.getName())
         }).at(-1)
+        //OR
+        let childWithSameName = this.getChild(this.name)
 
         // then return either myself or that file that matches the criteria.
-        return indexfile ?? this
+        let thing = childWithSameName ?? indexfile ?? this
 
+        if (thing == this) return thing;
+        else return thing.me()
     }
 
     public getChildMimetypesInclDir() {
@@ -246,6 +305,9 @@ export class DirNode {
     public getChildren(): DirNode[] {
         return Object.values(this.children);
     }
+    public getChild(name: string) {
+        return this.getChildren().filter(c => c.name == name)[0]
+    }
     public getAllChildrenRecursive(depth?: number): DirNode[] {
         if (depth === 0) return [];
         return [...this.getChildren(), ...this.getChildren().flatMap(c => c.getAllChildrenRecursive.apply(c, [depth ? depth - 1 : undefined]))];
@@ -260,12 +322,12 @@ export class DirNode {
         return this.getSiblings().indexOf(this)
     }
     public nextSibling() {
-        return this.getSiblings()[this.getSiblingIndex()+1]
+        return this.getSiblings()[this.getSiblingIndex() + 1]
     }
     public prevSibling() {
-        return this.getSiblings()[this.getSiblingIndex()-1]
+        return this.getSiblings()[this.getSiblingIndex() - 1]
     }
-    
+
     getParent() {
         return this.parent
     }
@@ -308,13 +370,18 @@ export class DirNode {
     }
     public getPath() {
         let path = this.path;
-        if(path[0]?.getName()=='') path = path.slice(1)
+        if (path[0]?.getName() == '') path = path.slice(1)
+        return path;
+    }
+    public getOriginalPath() {
+        let path = this.originalpath;
+        if (path[0]?.getName() == '') path = path.slice(1)
         return path;
     }
     public getPathStrings() {
         return this.getPath().map(e => e.getName()).filter(e => e != '')
     }
-    public collectFullPath() {
+    public recalculatePath() {
         let path = [];
         let parented: DirNode | null = this;
         while (parented) {
@@ -323,10 +390,15 @@ export class DirNode {
         }
         path.reverse();
         // let path = path.map(p => p.name)
+        this.path = path;
         return path;
     }
     public getFullPathString(): string {
         return path.normalize(this.getPath().map(node => node.getName()).join('/'))
+    }
+
+    public getFullFilePathString(): string {
+        return path.normalize(this.getOriginalPath().map(node => node.getName()).join('/'))
     }
 
     public getName() {
@@ -339,11 +411,11 @@ export class DirNode {
     }
     public chopIndexFromName() {
         let sibs = this.getSiblings()
-        if(sibs.length == sibs.filter(s=>s.getName().match(/^[0-9]+/)).length) {
-            let processedName = this.getName().replace(/^\d+/,'')
-            if(processedName!='') return processedName
+        if (sibs.length == sibs.filter(s => s.getName().match(/^[0-9]+/)).length) {
+            let processedName = this.getName().replace(/^\d+/, '')
+            if (processedName != '') return processedName
             else return this.getName()
-        } else {return this.getName()}
+        } else { return this.getName() }
     }
     public getNameNeutered() {
         return neutername(this.getName())
@@ -398,7 +470,7 @@ export class DirNode {
     public getAllNormalChildrenRecursive(depth?: number) {
         return this.getAllChildrenRecursive(depth).filter(child => !child.getIsSpecial())
     }
-    public getMeAndAllNormalChildrenRecursive(depth?:number) {
-        return [this,...this.getAllNormalChildrenRecursive(depth)]
+    public getMeAndAllNormalChildrenRecursive(depth?: number) {
+        return [this, ...this.getAllNormalChildrenRecursive(depth)]
     }
 }

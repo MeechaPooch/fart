@@ -5,6 +5,7 @@ let templateHtml = fs.readFileSync(__dirname + '/template.html').toString();
 let guyHtml = fs.readFileSync(__dirname + '/components/aguy.html').toString();
 
 export default async function convert(dirnode: DirNode): Promise<string> {
+    // dirnode = dirnode.me()
     const elemwidth = 40;
 
 
@@ -19,6 +20,7 @@ export default async function convert(dirnode: DirNode): Promise<string> {
 }
 
 export async function createGoob(dirnode: DirNode): Promise<string> {
+    // dirnode = dirnode.me()
     // return 'hi'
     return guyHtml
         .replaceAll('$foldername', dirnode.getDisplayName())

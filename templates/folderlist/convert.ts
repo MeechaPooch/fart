@@ -4,6 +4,7 @@ let templateHtml = fs.readFileSync(__dirname + '/template.html').toString();
 let squareHtml = fs.readFileSync(__dirname + '/components/square.html').toString();
 
 export default function convert(dirnode: DirNode): string {
+    // dirnode = dirnode.me()
     const elemwidth=40;
 
     return templateHtml
@@ -12,6 +13,7 @@ export default function convert(dirnode: DirNode): string {
 }
 
 export function createSquare(dirnode: DirNode): string {
+    // dirnode = dirnode.me()
     // return 'hi'
     return squareHtml
         .replaceAll('$itemicon', dirnode.generateIconHtml())

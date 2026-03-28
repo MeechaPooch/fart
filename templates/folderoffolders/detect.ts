@@ -1,6 +1,8 @@
 import { DirNode } from "../../runner/dirnode";
 
 export default function detect(dirnode: DirNode): number {
+    // dirnode = dirnode.me()
+
     let children = dirnode.getNormalChildren();
 
     // if all of children are unknown-directory mediatype

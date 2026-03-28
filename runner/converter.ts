@@ -73,6 +73,9 @@ async function compile(username: string) {
 
   dir.forEach((ent) => dirtree.placedirent(ent));
 
+  dirtree.rootnode.getAllChildrenRecursive().forEach(c=>c.collapseMe())
+  // dirtree.rootnode.collapseMe()
+
   // calculate type from lowest level of tree, up;
 
   process.chdir(usersOutputDir + '/' + username)
@@ -84,7 +87,7 @@ async function compile(username: string) {
     dirtree.rootnode,
     ...dirtree.rootnode.getAllNormalChildrenRecursive(),
   ]) {
-    let replacablechild = child.getReplacableThis();
+    let replacablechild = child.me();
     let template = replacablechild.getTemplate();
     let outputHtml;
     try {

@@ -16,8 +16,11 @@ export let mediatypesdirpath = converterProjectFolder + '/mediatypes'
 export let usersOutputDir = deployFolder + '/webroot/users'
 export let userdirsPath = deployFolder + '/database/users'
 export let webOutputDir = deployFolder + '/webroot'
+export let userSecretsPath = deployFolder + '/database/usersecrets'
 
-
+// secrets words
+export let passwordfilename = 'passwordhash.txt'
+export let usernamefilename = 'username.txt'
 
 
 // FILES AND FOLDERS RELATIVE TO USER FOLDER
@@ -40,6 +43,7 @@ export let enginepath = webprefix + enginename
 export let homename = ''
 
 
+export let settingsname = 'settings.txt'
 
 export let indexfiles = [
     'index.html',
@@ -50,7 +54,7 @@ export let specialfiles = [
     'note.txt',
     'note.md',
     'meta.txt',
+    settingsname,
     ...indexfiles
 ]
-
 // index.* anything goes??? will just display that as if it were the file/folder??? Epic!!!
