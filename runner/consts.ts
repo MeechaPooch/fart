@@ -14,7 +14,9 @@ export let mediatypesdirpath = converterProjectFolder + '/mediatypes'
 
 
 export let usersOutputDir = deployFolder + '/webroot/users'
-export let userdirsPath = deployFolder + '/database/users'
+export let userdirsPath = '/pub/users'
+export let defaultUsersPath = deployFolder + '/database/users'
+// export let userdirsPath = deployFolder + '/database/users'
 export let webOutputDir = deployFolder + '/webroot'
 export let userSecretsPath = deployFolder + '/database/usersecrets'
 
@@ -27,7 +29,7 @@ export let usernamefilename = 'username.txt'
 
 export let assetsname = '.assets'
 export let thumbnailsfoldername = '.thumbnails'
-export let enginename = '.engineassets'
+export let enginename = '.engine'
 
 export let randomstring = 'sd89sdKK9832Kj'
 // export let randomstring = Math.random().toString(36).slice(2)
@@ -43,7 +45,7 @@ export let enginepath = webprefix + enginename
 export let homename = ''
 
 
-export let settingsname = 'settings.txt'
+export let settingsFileName = 'settings.txt'
 
 export let indexfiles = [
     'index.html',
@@ -54,7 +56,7 @@ export let specialfiles = [
     'note.txt',
     'note.md',
     'meta.txt',
-    settingsname,
+    settingsFileName,
     ...indexfiles
 ]
 // index.* anything goes??? will just display that as if it were the file/folder??? Epic!!!

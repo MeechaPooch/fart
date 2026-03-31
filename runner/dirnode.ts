@@ -4,7 +4,7 @@ import path from 'path';
 import { mediatypes, templates } from './loadtemplates';
 import detect from '../templates/photo-video-folder-gallery/detect';
 import mime from 'mime-types'
-import { assetsname, homename, webprefix, specialfiles, indexfiles, enginepath, usersOutputDir, thumbnailsfoldername, settingsname } from "./consts";
+import { assetsname, homename, webprefix, specialfiles, indexfiles, enginepath, usersOutputDir, thumbnailsfoldername, settingsFileName, userdirsPath } from "./consts";
 import { neutername } from "./themes/pageprocesser";
 
 export class DirTree {
@@ -17,8 +17,11 @@ export class DirTree {
         this.belongsto = belongs;
     }
 
-    getOutputFilePath() {
+    getUserOutputDir() {
         return usersOutputDir + path.sep + this.belongsto
+    }
+    getUserInputDir() {
+        return userdirsPath + path.sep + this.belongsto
     }
     // for web
     getThumbnailsWebUrl() {
@@ -26,7 +29,7 @@ export class DirTree {
     }
     // for file
     getThumbnailsFilePath() {
-        return this.getOutputFilePath() + '/' + thumbnailsfoldername
+        return this.getUserOutputDir() + '/' + thumbnailsfoldername
     }
 
     getWebsiteDisplayName() {
@@ -170,14 +173,21 @@ export class DirNode {
         return !this.getParent()
     }
     public getSettings(): any {
-        let settingsFile = this.getChild(settingsname)
+        let settingsFile = this.getChild(settingsFileName)
         if (!settingsFile) return {};
-        let settings = Object.fromEntries(settingsFile.readSync().split('\n').map(line => line.split('=')))
+        let settings = Object.fromEntries(settingsFile.readSync().split('\n').filter(Boolean).map(line => line.split('=')).filter(e=>e[0]&&e[1]))
         return settings;
     }
     public getSetting(settingName: string): string | null | undefined {
         return this.getSettings()[settingName];
     }
+    public setSetting(settingName: string, settingValue: string) {
+        let settings = this.getSettings();
+        settings[settingName] = settingValue;
+        let settingsString = Object.entries(settings).map(s => `${s[0]}=${s[1]}`).join('\n') + '\n'
+        fs.writeFileSync(this.getUserDirActualFilePathString() + '/' + settingsFileName,settingsString)
+    }
+
 
     // replace with thumbnailer service
     public getIconHtml() {
@@ -399,6 +409,10 @@ export class DirNode {
 
     public getFullFilePathString(): string {
         return path.normalize(this.getOriginalPath().map(node => node.getName()).join('/'))
+    }
+
+    public getUserDirActualFilePathString() {
+        return this.getMyTree().getUserInputDir() + '/' + this.getFullFilePathString()
     }
 
     public getName() {

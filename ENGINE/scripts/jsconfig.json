@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "None",
+    "checkJs": true,
+    "allowJs": true
+  },
+  "include": [
+    "*.js",
+    "*.d.ts"
+  ]
+}

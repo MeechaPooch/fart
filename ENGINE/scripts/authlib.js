@@ -1,5 +1,5 @@
 
-window.AUTH = class {
+const AUTH = class {
 
     static username = location.host.split('.')[0]
 
@@ -28,9 +28,11 @@ window.AUTH = class {
         console.log('resjson',resjson)
         let token = resjson.token;
         console.log('setting  token',token)
-        COOKIE.set('token',token)
+        COOKIE.set('token',token,{
+            Domain:'.micahpowch.com'
+        })
 
-        window.pagetrix.goto(`https://${username}.micahpowch.com`)
+        pagetrix.goto(`https://${username}.micahpowch.com`)
     }
 
     // todo - recheck session
@@ -43,4 +45,4 @@ window.AUTH = class {
         return {username,token}
     }
 }
-window.AUTH =AUTH;
+window.AUTH = AUTH

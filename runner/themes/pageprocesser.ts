@@ -36,6 +36,7 @@ export function processpage(html: string, pagedirnode: DirNode): string {
         // .replaceAll('$shouldbackbuttonhideFriends', (pagedirnode.getIsRoot() || pagedirnode.getSiblings().length < 2) ? 'hidden' : 'dummy')
         // .replaceAll('$shouldbackbuttonhideAlone', (pagedirnode.getIsRoot() || pagedirnode.getSiblings().length >= 2) ? 'hidden' : 'dummy')
         .replaceAll('$debuginfo', `
+            Time Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}<br>
             Mimetype: ${pagedirnode.getMimetype()}<br>
             Mediatype: ${pagedirnode.getMediatype()}<br>
             Template: ${pagedirnode.getTemplate()}<br>

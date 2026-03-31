@@ -11,7 +11,11 @@
         }
 
 
-
+        if(await SITE.isMySite()) {
+            document.querySelector(':root').classList.add('mysite')
+        } else {
+            document.querySelector(':root').classList.add('notmysite')
+        }
         
     })()
 }

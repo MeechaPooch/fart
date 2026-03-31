@@ -3,9 +3,12 @@ const dropZone = document.getElementById('drop-zone');
 const fileList = document.getElementById('file-list');
 
 // 1. Show drop zone when dragging over the window
-window.addEventListener('dragenter', (e) => {
+window.addEventListener('dragenter', async (e) => {
     e.preventDefault();
-    dropZone.classList.add('active');
+    if (await SITE.isMySite()) {
+        dropZone.classList.add('active');
+
+    }
 });
 
 // 2. Keep drop zone active while dragging
@@ -42,26 +45,31 @@ async function handleFiles(files) {
         // var input = document.querySelector('input[type="file"]')
         let targetPath = window.location.pathname;
         let filepath = targetPath + '/' + file.name
-        filepath = filepath.replaceAll('//','/')
-        let username = AUTH.getUsername()
+        filepath = filepath.replaceAll('//', '/')
+        let username = window.AUTH.getUsername()
 
-        var data = new FormData()
-        data.append('file', file)
-        data.append('filepath', filepath)
-        data.append('username', username)
+        // var data = new FormData()
+        // data.append('file', file)
+        // data.append('filepath', filepath)
+        // data.append('username', username)
 
-        console.log('uploading', file)
 
-        let res = await fetch('https://api.micahpowch.com/upload', {
-            method: 'POST',
-            body: data,
-        })
+        // let res = await fetch('https://api.micahpowch.com/upload', {
+        //     method: 'POST',
+        //     body: data,
+        // })
+
+        let res = await API.uploadFile(file, filepath, username)
 
         let text = await res.text();
         console.log('text', text)
+
+        pagetrix.clearCache()
+
         if (text == 'reload') {
             pagetrix.reload();
         }
 
+        // clear pagetrix cache
     }
 }

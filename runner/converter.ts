@@ -9,6 +9,7 @@ import {
   thumbnailsfoldername,
   userdirsPath,
   usersOutputDir,
+  defaultUsersPath,
 } from "./consts";
 import { DirNode, DirTree } from "./dirnode";
 import { loadEverything, mediatypes, templates } from "./loadtemplates";
@@ -39,59 +40,17 @@ async function syncThatShit(sourceDir: string, outputDir: string) {
   });
 }
 
-async function compile(username: string) {
-  // process.chdir(deployFolder)
-  // if(fs.existsSync(outputDir))fs.rmSync(outputDir,{recursive:true}) /// longgg
-  let outputDir = usersOutputDir + path.sep + username
-  let assetsroot = userdirsPath + path.sep + username
-  let thumbnailsfullfilepath = outputDir + path.sep + thumbnailsfoldername
-  fs.mkdirSync(outputDir, { recursive: true });
-  fs.mkdirSync(thumbnailsfullfilepath, { recursive: true });
-  fs.mkdirSync(outputDir + path.sep + assetsname, {
-    recursive: true,
-  });
-  // fs.cpSync(assetsroot,outputDir + path.sep + assetsname + path.sep + homename,{recursive:true,preserveTimestamps:true}) /// longg
-  console.log("syncing that shit");
-  await syncThatShit(assetsroot + '/', outputDir + path.sep + assetsname);
-  console.log("that shit sinked");
+async function renderOnePage(pagedirnode: DirNode) {
+  try {
 
-  // output engine
-  // process.chdir(converterRunnerHome)
-  await syncThatShit(enginedir + path.sep, outputDir + path.sep + enginename + '/');
-  // process.chdir(projectHome)
-  process.chdir(outputDir + path.sep + assetsname);
-  let dir = fs.readdirSync(".", { recursive: true, withFileTypes: true });
-  // process.chdir('../')
-
-  console.log(dir)
-
-  // process.chdir("..");
-  // if(!fs.existsSync(homename)) fs.mkdirSync(homename)
-  // process.chdir(outputDir)
-
-  let dirtree = new DirTree(username);
-
-  dir.forEach((ent) => dirtree.placedirent(ent));
-
-  dirtree.rootnode.getAllChildrenRecursive().forEach(c=>c.collapseMe())
-  // dirtree.rootnode.collapseMe()
-
-  // calculate type from lowest level of tree, up;
-
-  process.chdir(usersOutputDir + '/' + username)
-
-  dirtree.rootnode.calculateMediatype();
-  dirtree.rootnode.calculateTemplate();
-
-  for (let child of [
-    dirtree.rootnode,
-    ...dirtree.rootnode.getAllNormalChildrenRecursive(),
-  ]) {
-    let replacablechild = child.me();
+    let userOutputDir = pagedirnode.getMyTree().getUserOutputDir()
+    let replacablechild = pagedirnode.me();
     let template = replacablechild.getTemplate();
     let outputHtml;
+
+    process.chdir(userOutputDir)
+
     try {
-      process.chdir(usersOutputDir + '/' + username)
 
       outputHtml = await templates[template].convert(replacablechild);
     } catch (e) {
@@ -100,28 +59,114 @@ async function compile(username: string) {
     if (!outputHtml)
       outputHtml = templates["unknown-file"].convert(replacablechild); // if thing fails
 
-    outputHtml = processpage(outputHtml, child);
+    outputHtml = processpage(outputHtml, pagedirnode);
     // outputHtml+='<br>template:'+template
     // outputHtml+='<br> mediatype:'+child.getMediatype()
     // outputHtml+='<br> mimetype: '+child.getMimetype()
     // outputHtml+='<br>'
-    let path2 = child.getFullPathString();
+    let path2 = pagedirnode.getFullPathString();
     fs.mkdirSync("." + path.sep + path2, { recursive: true });
     fs.writeFileSync(
       "." + path.sep + path2 + path.sep + "index.html",
       outputHtml,
     );
-  }
-  // hypothetically should be done!
+  } catch (e) { console.error(e) }
+}
+
+function compile(username: string, targetdir?: string): Promise<void> {
+
+  return new Promise(async (res) => {
+    try {
+      // process.chdir(deployFolder)
+      // if(fs.existsSync(outputDir))fs.rmSync(outputDir,{recursive:true}) /// longgg
+      let outputDir = usersOutputDir + path.sep + username
+      let assetsroot = userdirsPath + path.sep + username
+      let thumbnailsfullfilepath = outputDir + path.sep + thumbnailsfoldername
+      fs.mkdirSync(outputDir, { recursive: true });
+      fs.mkdirSync(thumbnailsfullfilepath, { recursive: true });
+      fs.mkdirSync(outputDir + path.sep + assetsname, {
+        recursive: true,
+      });
+      // fs.cpSync(assetsroot,outputDir + path.sep + assetsname + path.sep + homename,{recursive:true,preserveTimestamps:true}) /// longg
+      console.log("syncing that shit");
+      await syncThatShit(assetsroot + '/', outputDir + path.sep + assetsname);
+      console.log("that shit sinked");
+
+      // output engine
+      // process.chdir(converterRunnerHome)
+      await syncThatShit(enginedir + path.sep, outputDir + path.sep + enginename + '/');
+      // process.chdir(projectHome)
+      process.chdir(outputDir + path.sep + assetsname);
+      let dir = fs.readdirSync(".", { recursive: true, withFileTypes: true });
+      // process.chdir('../')
+
+      console.log(dir)
+
+      // process.chdir("..");
+      // if(!fs.existsSync(homename)) fs.mkdirSync(homename)
+      // process.chdir(outputDir)
+
+      let dirtree = new DirTree(username);
+
+      dir.forEach((ent) => dirtree.placedirent(ent));
+
+      dirtree.rootnode.getAllChildrenRecursive().forEach(c => c.collapseMe())
+      // dirtree.rootnode.collapseMe()
+
+      // calculate type from lowest level of tree, up;
+
+      process.chdir(usersOutputDir + '/' + username)
+
+      dirtree.rootnode.calculateMediatype();
+      dirtree.rootnode.calculateTemplate();
+
+      console.log('rootpath', dirtree.rootnode)
+      console.log('rootpathstrings', dirtree.rootnode.getPathStrings())
+
+      console.log('dir paths')
+      console.log(dirtree.rootnode.getMeAndAllNormalChildrenRecursive().map(e => "/" + e.getPathStrings().join('/')))
+
+
+
+      if (targetdir) {
+        let selector = targetdir?.split('/').filter(Boolean)
+        let selected = dirtree.rootnode;
+        for (let sel of selector) {
+          selected = selected?.getChild(sel);
+        }
+
+
+        if (selected) await renderOnePage(selected)
+        res(); // resolve early and continue rendering in backround
+
+        // todo: in future, create a queing module for site renders so that nobody renders their own site twice
+
+
+      }
+
+      for (let child of [
+        dirtree.rootnode,
+        ...dirtree.rootnode.getAllNormalChildrenRecursive(),
+      ]) {
+        await renderOnePage(child)
+      }
+      // hypothetically should be done!
+
+      res();
+    } catch (e) { console.error(e) }
+  })
 }
 
 
-export async function run(username?) {
+export async function run(username?: string, targetdir?: string) {
   await loadEverything();
   console.log("mediatypes and templates", mediatypes, templates);
 
+  // sync default dirs
+  await syncThatShit(defaultUsersPath + '/*',userdirsPath)
+
   if (username) {
-    await compile(username)
+    await compile(username, targetdir)
   } else {
 
     let users = fs.readdirSync(userdirsPath);
