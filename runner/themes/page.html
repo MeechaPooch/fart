@@ -19,6 +19,7 @@
 
     body {
         display: flex;
+        position: relative;
         flex-flow: column;
         align-items: center;
         font-size: 20px;
@@ -63,11 +64,17 @@
         padding: 2px;
     }
 
-    .topright,
     .topleft {
         width: var(--sillywidth);
-        position: fixed;
-        margin: 10px;
+        /* position: absolute; */
+        /* margin: 10px; */
+        max-height: 1px;
+        overflow: visible;
+        margin-right:10px;
+        line-height: 63%;
+    }
+    .topright,.topleft{
+        position:absolute
     }
 
     .topleft {
@@ -158,6 +165,7 @@
     }
 
     .containheader {
+        width: 100%;
         /* border: solid black 1px; */
         border-top: none;
         /* border-bottom-right-radius: 50px; */
@@ -169,6 +177,7 @@
     }
 
     .containtopper {
+        width: 100%;
         display: flex;
         flex-flow: row nowrap;
         align-items: center;
@@ -190,7 +199,8 @@
         flex-flow: row;
         align-items: center;
 
-        max-width: min(480px, 80vw);
+        /* max-width: min(480px, 80vw); */
+        max-width: min(480px, calc(100% - 20px));
         overflow: hidden;
         text-overflow: ellipsis;
         text-wrap: nowrap;
@@ -278,8 +288,10 @@
         color: unset;
     }
 
-    a:not(.normallink, .normallink a):not(.entryicon):hover {
+    a:not(.normallink, .normallink a):not(.entryicon):hover:not(:has(*)):not(.dontunderline, .dontunderline *),
+    a:not(.normallink, .normallink a):not(.entryicon):hover *:not(:has(*)):not(.dontunderline, .dontunderline *) {
         text-decoration: underline;
+        cursor: pointer;
     }
 
     .containheader .entryicon>img {
@@ -304,6 +316,86 @@
         transform: translateY(10px);
         /* Slight slide down effect */
     }
+
+
+    #topright:has(#usernametext:empty) {
+
+        .signupbutton {
+            display: flex;
+        }
+
+        .usernamebox {
+            display: none;
+        }
+    }
+
+    #topright:has(#usernametext):not(:has(#usernametext:empty)) {
+
+        .signupbutton {
+            display: none;
+        }
+
+        .usernamebox {
+            display: flex;
+        }
+
+    }
+
+    #topright {
+
+        .usernamebox:not(.active) {
+            .dropdownmenu {
+                display: none !important;
+            }
+
+            .dropdownarrow {
+                rotate: 270deg;
+            }
+        }
+
+        .usernamebox.active {
+            .dropdownmenu {
+                display: flex !important;
+            }
+
+            .dropdownarrow {
+                rotate: 90deg;
+            }
+        }
+
+    }
+
+    .usernamebox {
+
+        .dropdownarrow {
+            transition: 0.2s;
+        }
+
+        display: flex;
+        flex-flow: column;
+
+        .usernamebutton {
+            display: flex;
+            flex-flow: row nowrap;
+            gap: 5px;
+
+
+        }
+
+        .dropdownmenu {
+            border: solid black 1px;
+            display: flex;
+            flex-flow: column;
+
+            .dditem {
+                border-top: solid black 1px;
+                padding: 5px;
+            }
+        }
+
+    }
+
+
 
     .bottomarrows {
         display: flex;
@@ -340,10 +432,10 @@
     }
 
     .delete-button {
-        z-index:10;
+        z-index: 10;
         display: flex;
         opacity: 0%;
-        transition:0.1s;
+        transition: 0.1s;
 
         --dimension: 30px;
 
@@ -356,12 +448,17 @@
         right: calc(-0.5 * var(--dimension));
     }
 
-    .ITEM:hover .delete-button {
-        opacity: 100%;        
+    .notmysite .delete-button {
+        display: none !important;
     }
+
+    .ITEM:hover .delete-button {
+        opacity: 100%;
+    }
+
     .delete-button:hover {
-        scale:110%;
-        filter:brightness(110%);
+        scale: 110%;
+        filter: brightness(110%);
     }
 
     .notmysite .drop-zone {
@@ -456,13 +553,16 @@
                 ↖ </div>
         </a>
 
-        <div id="topleft" class="pagetrix-persist webpage topleft">
-            <a href="https://micahpowch.com" class="easybutton">
-                < explore</a>
-        </div>
+
 
         <div class="containheader">
             <div class="headbar">
+
+
+                <div id="topleft" class="pagetrix-persist webpage topleft">
+                    <a href="https://micahpowch.com" class="easybutton">
+                        < explore swampish</a>
+                </div>
                 <a href="$homeurl"><span class="websitename $boldifathome">$websitename</span></a>
                 $quicklinks
             </div>
@@ -480,7 +580,20 @@
         </div>
 
         <div id="topright" class="pagetrix-persist website topright">
-            <a href="https://login.micahpowch.com/signup.html" class="easybutton">sign up</a>
+            <a href="https://login.micahpowch.com/signup.html" class="easybutton signupbutton">sign up</a>
+            <div id="usernamebox" class="usernamebox"
+                onclick="document.querySelector('#usernamebox').classList.toggle('active')">
+                <a class="easybutton usernamebutton">
+                    <span id="usernametext"></span>
+                    <span>
+                        <div class="dropdownarrow dontunderline"> > </div>
+                    </span>
+                </a>
+                <div class="dropdownmenu">
+                    <a class="dditem" id="mysitebutton">my site</a>
+                    <a class="dditem" id="logoutbutton">log out</a>
+                </div>
+            </div>
         </div>
 
         <div class="upbutton location spaceholder $shouldbackbuttonhideAlone">

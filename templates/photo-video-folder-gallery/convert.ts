@@ -3,7 +3,7 @@ import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path';
 import { DirNode } from '../../runner/dirnode';
-import { randomstring, thumbnailsfoldername, webprefix } from '../../runner/consts';
+import { cachefoldername, randomstring, webprefix } from '../../runner/consts';
 import sharp from 'sharp';
 let template = fs.readFileSync(__dirname + path.sep + './template.html').toString()
 let stylesheet = fs.readFileSync(__dirname + path.sep + './style.css').toString()
@@ -14,14 +14,14 @@ import { getFileHashSync } from '../../runner/utils';
 // create thumbnail file in assets folder
 
 function createentryhtml(dirnode: DirNode, thumbnailwidth?: number): string {
-    let thumbnailsfullfilepath = thumbnailsfoldername
+    let thumbnailsfullfilepath = dirnode.getMyTree().getUserOutputDir() + '/' + cachefoldername
     let defaultwidth = 200;
     let thumbnailfilename: string = 'none';
     generatethumbnail: if (dirnode.getMediatype() == 'image') {
         // thumbnail image
         // todo: come back to thumbnailer
         try {
-            thumbnailfilename = getFileHashSync(dirnode.getFilePath()) + '.png'
+            thumbnailfilename = dirnode.getFileHash() + '.png' // variable image type?
             let thumbnailfilepath = thumbnailsfullfilepath + '/' + thumbnailfilename;
             // let thumbnailfilepath = dirnode.getParent()?.getFilePath() + '/' + thumbnailfilename;
 
@@ -31,9 +31,10 @@ function createentryhtml(dirnode: DirNode, thumbnailwidth?: number): string {
                 break generatethumbnail;
             }
 
-            console.log('thumbnailing image', dirnode.getName())
-console.log('WORKING DIR',process.cwd());
-            sharp(dirnode.getFilePath()).resize(thumbnailwidth ?? defaultwidth).toFile(thumbnailfilepath).catch(e => console.log(e)).finally(() => { console.log('finished thumbnailing', thumbnailfilename) })
+            console.log('thumbnailing image', dirnode.getAssetPath())
+            console.log('input image', dirnode.getAssetPath())
+            console.log('output image', thumbnailfilepath)
+            sharp(dirnode.getAssetPath()).resize(thumbnailwidth ?? defaultwidth).toFile(thumbnailfilepath).catch(e => console.log(e)).finally(() => { console.log('finished thumbnailing', thumbnailfilename) })
 
 
         } catch (e) {
@@ -41,9 +42,10 @@ console.log('WORKING DIR',process.cwd());
         }
     } else if (dirnode.getMediatype() == 'video') {
         // thumbnail video
-        thumbnailfilename = getFileHashSync(dirnode.getFilePath()) + '.png'
+        thumbnailfilename = dirnode.getFileHash() + '.png'
 
         let thumbnailfilepath = thumbnailsfullfilepath + '/' + thumbnailfilename;
+        let thumbnailTEMPfilepath = thumbnailsfullfilepath + '/' + 'temp-' + thumbnailfilename;
 
         /// 🚨🚨🚨🚨🚨
         if (fs.existsSync(thumbnailfilepath)) {
@@ -51,12 +53,12 @@ console.log('WORKING DIR',process.cwd());
             break generatethumbnail;
         }
 
-        console.log('thumbnailing video',dirnode.getFilePath())
-        ffmpeg(dirnode.getFilePath()).seekInput(0).frames(1).output(thumbnailfilepath + '-temp.jpeg')
-            .on('error', console.log).on('end', () => {
+        console.log('thumbnailing video',dirnode.getAssetPath())
+        ffmpeg(dirnode.getAssetPath()).seekInput(0).frames(1).output(thumbnailTEMPfilepath)
+            .on('error', e=>console.log('sharp 1 image error',e)).on('end', () => {
                 console.log('image finished processing')
-                sharp(thumbnailfilepath + '-temp.jpeg').resize(thumbnailwidth).toFile(thumbnailfilepath).then(() => {
-                    if (fs.existsSync(thumbnailfilepath + '-temp.jpeg')) fs.rmSync(thumbnailfilepath + '-temp.jpeg')
+                sharp(thumbnailTEMPfilepath).resize(thumbnailwidth).toFile(thumbnailfilepath).then(() => {
+                    if (fs.existsSync(thumbnailTEMPfilepath)) fs.rmSync(thumbnailTEMPfilepath)
                     console.log('finished thumbnailing', thumbnailfilename)
                 })
             }).run()
@@ -67,7 +69,7 @@ console.log('WORKING DIR',process.cwd());
     // with 30 items: 160 (this should be minimum)
     // with 10 items: 400 (this should be minimum)
     return entrytemplate
-        .replaceAll('$thumbnailurl', `${dirnode.getMyTree().getThumbnailsWebUrl()}/${thumbnailfilename}`)
+        .replaceAll('$thumbnailurl', `${dirnode.getMyTree().getCacheWebUrl()}/${thumbnailfilename}`)
         // .replaceAll('$thumbnailurl', `${dirnode.getParent()?.getAssetWebUrl()}/${thumbnailfilename}`) // old pre-thumbnail folder
         // .replaceAll('$thumbnailurl', `${webprefix}/assets/${dirnode.getFullPathString()}-thumbnail${randomstring}.png`)
         // .replaceAll('$thumbnailurl', `${webprefix}/assets/${dirnode.getFullPathString()}`)

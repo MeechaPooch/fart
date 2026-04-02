@@ -1,13 +1,17 @@
 {
     (async () => {
-        let userbox = document.querySelector('#topright')
+        let userbox = document.querySelector('#usernametext')
+        let logoutbutton = document.querySelector('#logoutbutton')
+        let mysitebutton = document.querySelector('#mysitebutton')
 
 
         let activesession = await AUTH.getSession();
         // todo: recheck session
 
         if (activesession) {
-            userbox.innerHTML = activesession.username
+            userbox.innerText = activesession.username;
+            mysitebutton.setAttribute('href',`https://${activesession.username}.micahpowch.com`)
+            
         }
 
 

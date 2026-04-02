@@ -15,7 +15,7 @@ let style_soffice = fs.readFileSync(__dirname + '/style-soffice.css')
 
 export default async function convertt(dirnode: DirNode): Promise<string | undefined> {
 try{
-    let outdir = dirnode.getFilePath() + randomstring;
+    let outdir = dirnode.getAssetPath() + randomstring;
     // new main
     await new Promise((resolve, error) => {
         cp.exec(`soffice --headless --norestore --nologo --convert-to html --outdir "${outdir}" "${dirnode.getFilePath()}"`).on('message', (m) => {

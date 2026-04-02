@@ -28,7 +28,7 @@ export let usernamefilename = 'username.txt'
 // FILES AND FOLDERS RELATIVE TO USER FOLDER
 
 export let assetsname = '.assets'
-export let thumbnailsfoldername = '.thumbnails'
+export let cachefoldername = '.cache'
 export let enginename = '.engine'
 
 export let randomstring = 'sd89sdKK9832Kj'

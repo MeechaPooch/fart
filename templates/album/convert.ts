@@ -4,7 +4,7 @@ import path from 'path'
 import { parseFile } from 'music-metadata'
 import CodecParser from 'codec-parser'
 import { secstohms } from "../../runner/utils";
-import { enginepath } from "../../runner/consts";
+import { cachefoldername, enginepath } from "../../runner/consts";
 let template = fs.readFileSync(__dirname + path.sep + 'template.html').toString()
 let tracktemplate = fs.readFileSync(__dirname + path.sep + 'components/track.html').toString()
 
@@ -28,8 +28,27 @@ export default async function convert(dirnode: DirNode): Promise<string> {
             `))
         .replaceAll('$minutelength', (Math.round(totalDuration / 60)).toString())
         .replaceAll('$trackcount', dirnode.getNormalChildrenMediatype('audio').length.toString())
-        .replaceAll('$assetweburl',dirnode.getAssetWebUrl())
+        .replaceAll('$assetweburl', dirnode.getAssetWebUrl())
 
+}
+
+async function parseFileOrReadFromCache(dirnode: DirNode) {
+    let cacheFile = cachefoldername + '/' + 'musicinfo' + dirnode.getFileHash() + '.json';
+    fs.mkdirSync(cachefoldername, { recursive: true });
+    if (fs.existsSync(cacheFile)) {
+        let file = fs.readFileSync(cacheFile).toString();
+        let json = JSON.parse(file);
+        return json;
+    }
+    else {
+        let output = await parseFile(dirnode.getAssetPath(), { duration: true,skipCovers:true,skipPostHeaders:true })
+        output.native = null; // clear large tags like image
+        output.common = null;
+        output.quality = null;
+        fs.writeFileSync(cacheFile,JSON.stringify(output))
+        return output;
+
+    }
 }
 
 async function createTrack(dirnode: DirNode) {
@@ -40,7 +59,8 @@ async function createTrack(dirnode: DirNode) {
     //     onCodecUpdate: () => { },
     //     enableLogging: true
     // })
-    let duration = (await parseFile(dirnode.getFilePath(), { duration: true })).format.duration
+    let musicmeta = await parseFileOrReadFromCache(dirnode)
+    let duration = musicmeta.format.duration
     totalDuration += duration ?? 0
     console.log('parsing complete', dirnode.getDisplayName())
     // let duration=0

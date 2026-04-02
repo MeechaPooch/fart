@@ -6,7 +6,7 @@ import {
   enginename,
   homename,
   deployFolder,
-  thumbnailsfoldername,
+  cachefoldername,
   userdirsPath,
   usersOutputDir,
   defaultUsersPath,
@@ -81,7 +81,7 @@ function compile(username: string, targetdir?: string): Promise<void> {
       // if(fs.existsSync(outputDir))fs.rmSync(outputDir,{recursive:true}) /// longgg
       let outputDir = usersOutputDir + path.sep + username
       let assetsroot = userdirsPath + path.sep + username
-      let thumbnailsfullfilepath = outputDir + path.sep + thumbnailsfoldername
+      let thumbnailsfullfilepath = outputDir + path.sep + cachefoldername
       fs.mkdirSync(outputDir, { recursive: true });
       fs.mkdirSync(thumbnailsfullfilepath, { recursive: true });
       fs.mkdirSync(outputDir + path.sep + assetsname, {

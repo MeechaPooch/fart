@@ -4,8 +4,9 @@ import path from 'path';
 import { mediatypes, templates } from './loadtemplates';
 import detect from '../templates/photo-video-folder-gallery/detect';
 import mime from 'mime-types'
-import { assetsname, homename, webprefix, specialfiles, indexfiles, enginepath, usersOutputDir, thumbnailsfoldername, settingsFileName, userdirsPath } from "./consts";
+import { assetsname, homename, webprefix, specialfiles, indexfiles, enginepath, usersOutputDir, cachefoldername, settingsFileName, userdirsPath } from "./consts";
 import { neutername } from "./themes/pageprocesser";
+import { getFileHashSync } from "./utils";
 
 export class DirTree {
 
@@ -24,12 +25,12 @@ export class DirTree {
         return userdirsPath + path.sep + this.belongsto
     }
     // for web
-    getThumbnailsWebUrl() {
-        return '/' + thumbnailsfoldername
+    getCacheWebUrl() {
+        return '/' + cachefoldername
     }
     // for file
-    getThumbnailsFilePath() {
-        return this.getUserOutputDir() + '/' + thumbnailsfoldername
+    getCacheFilePath() {
+        return this.getUserOutputDir() + '/' + cachefoldername
     }
 
     getWebsiteDisplayName() {
@@ -185,7 +186,10 @@ export class DirNode {
         let settings = this.getSettings();
         settings[settingName] = settingValue;
         let settingsString = Object.entries(settings).map(s => `${s[0]}=${s[1]}`).join('\n') + '\n'
-        fs.writeFileSync(this.getUserDirActualFilePathString() + '/' + settingsFileName,settingsString)
+        fs.writeFileSync(this.getInputFilePathString() + '/' + settingsFileName,settingsString)
+    }
+    public getFileHash() {
+        return getFileHashSync(this.getAssetPath())
     }
 
 
@@ -234,14 +238,15 @@ export class DirNode {
     }
 
     // file operations
+    // depricated
     getFilePath() {
         return `./${assetsname}/${this.getFullFilePathString()}`
     }
     public statSync() {
-        return fs.statSync(this.getFilePath())
+        return fs.statSync(this.getAssetPath())
     }
     public readSync() {
-        return fs.readFileSync(this.getFilePath()).toString()
+        return fs.readFileSync(this.getAssetPath()).toString()
     }
 
     public getChildTemplates() {
@@ -411,8 +416,11 @@ export class DirNode {
         return path.normalize(this.getOriginalPath().map(node => node.getName()).join('/'))
     }
 
-    public getUserDirActualFilePathString() {
+    public getInputFilePathString() {
         return this.getMyTree().getUserInputDir() + '/' + this.getFullFilePathString()
+    }
+    public getAssetPath() {
+        return this.getMyTree().getUserOutputDir() + '/' + assetsname + '/' + this.getFullFilePathString()
     }
 
     public getName() {
